@@ -1,0 +1,19 @@
+import z from 'zod';
+
+export const registerSchema = z
+  .object({
+    name: z.string(),
+    email: z.email(),
+    password: z.string(),
+  })
+  .required();
+
+export const signInSchema = z
+  .object({
+    email: z.email(),
+    password: z.string(),
+  })
+  .required();
+
+export type SignInDto = z.infer<typeof signInSchema>;
+export type RegisterDto = z.infer<typeof registerSchema>;
