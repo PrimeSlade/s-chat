@@ -10,6 +10,7 @@ export interface responseFormat<T> {
   status: 'success';
   data: T;
   message: string;
+  timestamp: Date;
 }
 
 @Injectable()
@@ -21,7 +22,7 @@ export class ResponseInterceptor<T> implements NestInterceptor {
     return next.handle().pipe(
       map((data) => ({
         status: 'success',
-        data: data?.data ?? data,
+        data: data?.data ?? null,
         message: data?.message ?? 'Request successful',
         timestamp: new Date(),
       })),
