@@ -8,6 +8,7 @@ import {
 import { Response, Request } from 'express';
 import { Prisma } from 'generated/prisma/client';
 import { mapPrismaError } from '../helpers/prisma-error.helper';
+import { ZodError } from 'zod';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -17,7 +18,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status: number;
-    let message: string;
+    let message: string | string[];
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
