@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GoogleStrategy } from './google.strategy';
+import { RefreshTokenGuard } from './refresh-token.guard';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { GoogleStrategy } from './google.strategy';
       useFactory: (configService: ConfigService) => ({
         global: true,
         secret: configService.get<string>('JWT_SECRET_KEY'),
-        signOptions: { expiresIn: '7d' },
+        signOptions: { expiresIn: '1h' },
       }),
     }),
   ],
@@ -26,6 +27,7 @@ import { GoogleStrategy } from './google.strategy';
   providers: [
     AuthService,
     GoogleStrategy,
+    RefreshTokenGuard,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

@@ -10,7 +10,6 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Prisma } from 'generated/prisma/client';
-import { NotFoundError, Observable } from 'rxjs';
 import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { UsersService } from 'src/users/users.service';
 
@@ -29,27 +28,19 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    //for future purpose
-    // const cookieName =
-    //   this.reflector.getAllAndOverride<string>(COOKIE_NAME_KEY, [
-    //     context.getHandler(),
-    //     context.getClass(),
-    //   ]) || 'default_cookie'; // fallback name
-
     if (isPublic) {
       return true;
     }
 
     const request = context.switchToHttp().getRequest<Request>();
-
-    const token = request.cookies['world_snap_user'];
+    const token = this.extractTokenFromHeader(request);
 
     if (!token) {
       throw new UnauthorizedException();
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token.access_token, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET_KEY'),
       });
 
@@ -69,5 +60,10 @@ export class AuthGuard implements CanActivate {
     }
 
     return true;
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 }

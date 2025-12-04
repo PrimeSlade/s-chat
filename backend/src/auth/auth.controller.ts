@@ -18,6 +18,8 @@ import { RegisterDto, SignInDto, signInSchema } from './dto/auth.dto';
 import { User } from 'src/users/entities/user.entity';
 import { ResponseType } from 'src/common/types/responce.type';
 import { GoogleOAuthGard } from './google-oauth.guard';
+import { RefreshTokenGuard } from './refresh-token.guard';
+
 @Public()
 @Controller('auth')
 export class AuthController {
@@ -44,16 +46,39 @@ export class AuthController {
   async signIn(
     @Body() signInDto: SignInDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<{ message: string }> {
-    const access_token = await this.authService.signIn(signInDto);
+  ): Promise<{ access_token: string; message: string }> {
+    const token = await this.authService.signIn(signInDto);
 
-    response.cookie('world_snap_user', access_token, {
+    response.cookie('s_chat_refresh_token', token.refresh_token, {
       httpOnly: true,
       secure: this.configService.get<string>('NODE_ENV') === 'production',
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 day
     });
 
-    return { message: 'Successfully logged in' };
+    return {
+      access_token: token.access_token,
+      message: 'Successfully logged in',
+    };
+  }
+
+  @Post('refresh')
+  @UseGuards(RefreshTokenGuard)
+  async refreshToken(
+    @Req() req,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const token = await this.authService.getTokens(req.user.id);
+
+    response.cookie('s_chat_refresh_token', token.refresh_token, {
+      httpOnly: true,
+      secure: this.configService.get<string>('NODE_ENV') === 'production',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 day
+    });
+
+    return {
+      access_token: token.access_token,
+      message: 'Successfully refreshed',
+    };
   }
 
   @Get('google')
