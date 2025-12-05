@@ -12,6 +12,8 @@ export const auth = betterAuth({
     enabled: true,
   },
   advanced: {
-    disableOriginCheck: true, // ⚠️ Only use this during development!
+    disableOriginCheck: true, //Only use this during development!
   },
+  trustedOrigins: ['http://localhost:3000'],
+  baseURL: process.env.BETTER_AUTH_URL,
 });
