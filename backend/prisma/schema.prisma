@@ -25,9 +25,35 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  //custom fields
+  bio String?
+  username String? @unique
+
+  sentRequests     Friendship[] @relation("sender")
+  receivedRequests Friendship[] @relation("receiver")
+
   @@unique([email])
   @@map("user")
 }
+
+model Friendship {
+  id String @id @default(uuid())
+  
+  senderId String
+  sender User @relation("sender",fields: [senderId],references: [id])
+
+  receiverId String
+  receiver User @relation("receiver",fields: [receiverId],references: [id])
+
+  status  FriendStatus  @default(PENDING) // PENDING, ACCEPTED, BLOCKED
+
+  createdAt  DateTime @default(now())
+
+  @@unique([senderId,receiverId]) // user cannot add accpeted or requested again
+
+  @@map("friend_ships")
+}
+
 
 model Session {
   id        String   @id
@@ -75,4 +101,10 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
 }
