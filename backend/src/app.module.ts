@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma.module';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './lib/auth';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { auth } from './lib/auth';
     AuthModule.forRoot({ auth }),
     UsersModule,
     PrismaModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
