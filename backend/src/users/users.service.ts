@@ -1,20 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'generated/prisma/client';
+import { Friendship, User } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class UsersService {
   constructor(private prismaService: PrismaService) {}
-  // async findOne(id: number): Promise<User> {
-  //   const user = await this.prismaService.user.findUniqueOrThrow({
-  //     where: {
-  //       id,
-  //       deletedAt: null,
-  //     },
-  //   });
-  //   const { password, ...result } = user;
-  //   return result;
-  // }
+
+  async findFriends(myId: string): Promise<Friendship[]> {
+    const friends = await this.prismaService.friendship.findMany({
+      where: {
+        id: myId,
+        status: 'ACCEPTED',
+      },
+    });
+
+    return friends;
+  }
+
+  async findPendingStrangers(myId: string): Promise<Friendship[]> {
+    const strangers = await this.prismaService.friendship.findMany({
+      where: {
+        id: myId,
+        status: 'PENDING',
+      },
+    });
+
+    return strangers;
+  }
+
+  async findUserByUserName(username: string, myId: string): Promise<User> {
+    const user = await this.prismaService.user.findFirstOrThrow({
+      where: {
+        username,
+        id: { not: myId },
+      },
+    });
+    return user;
+  }
+
+  //add user via ids
+  async addUser(receiverId: string, senderId: string): Promise<Friendship> {
+    const user = await this.prismaService.friendship.create({
+      data: {
+        senderId,
+        receiverId,
+      },
+    });
+
+    return user;
+  }
 
   async updateUsername(userId: string, username: string): Promise<User> {
     const user = await this.prismaService.user.update({
@@ -23,6 +57,22 @@ export class UsersService {
       },
       data: {
         username,
+      },
+    });
+
+    return user;
+  }
+
+  async acceptUser(receiverId: string, senderId: string): Promise<Friendship> {
+    const user = await this.prismaService.friendship.update({
+      where: {
+        senderId_receiverId: {
+          senderId,
+          receiverId,
+        },
+      },
+      data: {
+        status: 'ACCEPTED',
       },
     });
 

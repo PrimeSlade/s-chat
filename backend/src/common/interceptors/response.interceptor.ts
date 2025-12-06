@@ -30,7 +30,6 @@ export class ResponseInterceptor<T> implements NestInterceptor {
         status: 'success',
         data: data?.data ?? null,
         message: data?.message ?? 'Request successful',
-        accessToken: data.access_token,
         timestamp: new Date(),
         ...(data?.pagination && { pagination: data.pagination }),
       })),

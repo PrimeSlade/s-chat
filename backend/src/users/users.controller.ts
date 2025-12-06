@@ -23,6 +23,9 @@ export class UsersController {
     return { data: session.user, message: 'User fetched successfully' };
   }
 
+  @Get('friends')
+  async getFriends() {}
+
   @Patch('me/username')
   async updateUsername(
     @Body(new ZodValidationPipe(updateUsernameSchema)) body: UpdateUsernameDto,
@@ -44,10 +47,27 @@ export class UsersController {
   // }
 
   @Post('/request-by-username')
-  addFriend(
+  async addFriend(
     @Body() body: { username: string },
     @Session() session: UserSession,
   ) {
-    console.log(session.user.id);
+    const user = await this.usersService.findUserByUserName(
+      body.username,
+      session.user.id,
+    );
+
+    const addedUser = this.usersService.addUser(user.id, session.user.id);
+
+    return { data: addedUser, message: 'User added successfully' };
+  }
+
+  @Post('/accept')
+  async acceptFriend(
+    @Body() body: { id: string },
+    @Session() session: UserSession,
+  ) {
+    const user = await this.usersService.acceptUser(body.id, session.user.id);
+
+    return { data: user, message: 'User accepted successfully' };
   }
 }
