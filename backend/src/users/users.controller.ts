@@ -24,7 +24,21 @@ export class UsersController {
   }
 
   @Get('friends')
-  async getFriends() {}
+  async getFriends(@Session() session: UserSession) {
+    console.log(session.user.id);
+    const friends = await this.usersService.findFriends(session.user.id);
+
+    return { data: friends, message: 'Friends fetched successfully' };
+  }
+
+  @Get('strangers')
+  async getStrangers(@Session() session: UserSession) {
+    const strangers = await this.usersService.findPendingStrangers(
+      session.user.id,
+    );
+
+    return { data: strangers, message: 'Strangers fetched successfully' };
+  }
 
   @Patch('me/username')
   async updateUsername(
@@ -61,12 +75,12 @@ export class UsersController {
     return { data: addedUser, message: 'User added successfully' };
   }
 
-  @Post('/accept')
+  @Post('/accept-friends')
   async acceptFriend(
     @Body() body: { id: string },
     @Session() session: UserSession,
   ) {
-    const user = await this.usersService.acceptUser(body.id, session.user.id);
+    const user = await this.usersService.acceptUser(session.user.id, body.id);
 
     return { data: user, message: 'User accepted successfully' };
   }

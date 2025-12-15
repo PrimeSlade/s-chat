@@ -54,7 +54,6 @@ model Friendship {
   @@map("friend_ships")
 }
 
-
 model Session {
   id        String   @id
   expiresAt DateTime
