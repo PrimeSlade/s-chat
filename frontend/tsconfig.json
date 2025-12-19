@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@backend/shared/*": ["../backend/src/shared/*"],
+      "@backend/shared": ["../backend/src/shared/index.ts"],
+      "generated/prisma/client": ["../backend/generated/prisma/client"]
     }
   },
   "include": [

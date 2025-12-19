@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Friendship, User } from '../shared';
+import { Friendship, FriendshipWithUsers, User } from '../shared';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class UsersService {
   }
 
   //Friends
-  async findFriends(myId: string): Promise<Friendship[]> {
+  async findFriends(myId: string): Promise<FriendshipWithUsers[]> {
     const friends = await this.prismaService.friendship.findMany({
       where: {
         status: 'ACCEPTED',

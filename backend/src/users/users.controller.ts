@@ -6,6 +6,8 @@ import {
   Req,
   Post,
   UsePipes,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Session, UserSession } from '@thallesp/nestjs-better-auth';
 import { UsersService } from './users.service';
@@ -15,6 +17,7 @@ import {
   UpdateUsernameDto,
   ResponseType,
   Friendship,
+  FriendshipWithUsers,
 } from '../shared';
 import { User } from 'better-auth';
 
@@ -22,6 +25,7 @@ import { User } from 'better-auth';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  //Type Error
   @Get('me')
   getProfile(@Session() session: UserSession): ResponseType<User> {
     return { data: session.user, message: 'User fetched successfully' };
@@ -30,7 +34,7 @@ export class UsersController {
   @Get('friends')
   async getFriends(
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship[]>> {
+  ): Promise<ResponseType<FriendshipWithUsers[]>> {
     const friends = await this.usersService.findFriends(session.user.id);
 
     return { data: friends, message: 'Friends fetched successfully' };

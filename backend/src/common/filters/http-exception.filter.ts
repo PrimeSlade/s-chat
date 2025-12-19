@@ -23,8 +23,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const res = exception.getResponse();
+
       // Some exceptions return an object, some a string
-      message = (res as any).message;
+      if (typeof res === 'string') {
+        message = res;
+      } else {
+        message = (res as any).message;
+      }
     } else if (
       exception instanceof Prisma.PrismaClientKnownRequestError ||
       exception instanceof Prisma.PrismaClientValidationError
