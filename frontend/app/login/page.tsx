@@ -27,7 +27,7 @@ export default function LoginPage() {
           name,
         },
         {
-          onSuccess: () => router.push("/dashboard"),
+          onSuccess: () => router.push("/username"),
           onError: (ctx) => alert(ctx.error.message),
         }
       );

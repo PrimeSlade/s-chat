@@ -5,8 +5,8 @@ import { useSession } from "@/lib/auth-client";
 import { chooseFriends } from "@/lib/hanldeFriends";
 
 export default function FriendPage() {
-  const { data: friendData, isLoading } = useFriends();
-  const { data: session, isPending, error } = useSession();
+  const { data: friendData } = useFriends();
+  const { data: session } = useSession();
 
   if (!session) return null;
 

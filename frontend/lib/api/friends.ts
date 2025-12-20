@@ -3,6 +3,8 @@ import {
   Friendship,
   FriendshipWithUsers,
   ResponseFormat,
+  UpdateUsernameDto,
+  User,
 } from "@backend/shared";
 
 const getFriends = async (): Promise<
@@ -27,10 +29,26 @@ const getStrangers = async (): Promise<
       "/users/strangers"
     );
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
     throw new Error("Error");
   }
 };
 
-export { getFriends, getStrangers };
+const patchUserName = async (
+  inputData: UpdateUsernameDto
+): Promise<ResponseFormat<User> | undefined> => {
+  try {
+    const { data } = await axiosInstance.patch<ResponseFormat<User>>(
+      "/users/me/username",
+      inputData
+    );
+
+    return data;
+  } catch (error: any) {
+    console.log(error.response.data);
+    throw new Error(error.response.data.message);
+  }
+};
+
+export { getFriends, getStrangers, patchUserName };

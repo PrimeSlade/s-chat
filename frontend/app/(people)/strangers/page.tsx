@@ -1,3 +1,4 @@
+"use client";
 import { FriendBox, Status } from "@/components/people/friend-box";
 import React from "react";
 

@@ -1,3 +1,4 @@
+import { AddFriendDialog } from "@/components/people/add-friend-dialog";
 import NavBar from "@/components/navbar/nav-bar";
 import { getFriends, getStrangers } from "@/lib/api/friends";
 import {
@@ -21,7 +22,10 @@ export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="p-4 space-y-4">
-        <NavBar />
+        <div className="flex justify-between items-center">
+          <NavBar />
+          <AddFriendDialog />
+        </div>
         <div>{children}</div>
       </div>
     </HydrationBoundary>

@@ -8,8 +8,8 @@ export default function NavBar() {
 
   const getLinkClass = (path: string) => {
     return pathname === path
-      ? "text-primary"
-      : "text-muted-foreground hover:text-primary";
+      ? "text-(--primary-color)"
+      : "text-muted-foreground hover:text-(--primary-color)";
   };
 
   return (
