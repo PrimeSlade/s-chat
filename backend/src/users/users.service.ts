@@ -1,121 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Friendship, FriendshipWithUsers, User } from '../shared';
-import { PrismaService } from 'src/prisma.service';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   //Find by username
   async findUserByUserName(username: string, myId: string): Promise<User> {
-    const user = await this.prismaService.user.findFirstOrThrow({
-      where: {
-        username,
-        id: { not: myId },
-      },
-    });
-    return user;
+    return this.usersRepository.findUserByUserName(username, myId);
   }
 
   //Update name
   async updateUsername(userId: string, username: string): Promise<User> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        username,
-      },
-    });
-
-    return user;
+    return this.usersRepository.updateUsername(userId, username);
   }
 
   //Friends
   async findFriends(myId: string): Promise<FriendshipWithUsers[]> {
-    const friends = await this.prismaService.friendship.findMany({
-      where: {
-        status: 'ACCEPTED',
-        OR: [{ senderId: myId }, { receiverId: myId }], //both sides
-      },
-      include: {
-        sender: true,
-        receiver: true,
-      },
-    });
-
-    return friends;
+    return this.usersRepository.findFriends(myId);
   }
 
   //Pending
   async findPendingStrangers(myId: string): Promise<Friendship[]> {
-    const strangers = await this.prismaService.friendship.findMany({
-      where: {
-        receiverId: myId,
-        status: 'PENDING',
-      },
-      include: {
-        sender: true,
-      },
-    });
-
-    return strangers;
+    return this.usersRepository.findPendingStrangers(myId);
   }
 
   //Add user via ids
   async addUser(receiverId: string, senderId: string): Promise<Friendship> {
-    const user = await this.prismaService.friendship.create({
-      data: {
-        senderId,
-        receiverId,
-      },
-    });
+    // throw new NotFoundException();
 
-    return user;
+    return this.usersRepository.addUser(receiverId, senderId);
   }
 
   //Accept
   async acceptUser(receiverId: string, senderId: string): Promise<Friendship> {
-    const user = await this.prismaService.friendship.update({
-      where: {
-        senderId_receiverId: {
-          senderId,
-          receiverId,
-        },
-      },
-      data: {
-        status: 'ACCEPTED',
-      },
-    });
-
-    return user;
+    return this.usersRepository.acceptUser(receiverId, senderId);
   }
 
   //Block
   async blockUser(receiverId: string, senderId: string): Promise<Friendship> {
-    const user = await this.prismaService.friendship.update({
-      where: {
-        senderId_receiverId: {
-          senderId,
-          receiverId,
-        },
-      },
-      data: {
-        status: 'BLOCKED',
-      },
-    });
-
-    return user;
+    return this.usersRepository.blockUser(receiverId, senderId);
   }
-
-  // async softDeleteUser(id: number): Promise<undefined> {
-  //   await this.prismaService.user.update({
-  //     where: {
-  //       id,
-  //     },
-  //     data: {
-  //       deletedAt: new Date(),
-  //     },
-  //   });
-  // }
 }

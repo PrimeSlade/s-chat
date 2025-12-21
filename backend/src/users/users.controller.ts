@@ -8,6 +8,7 @@ import {
   UsePipes,
   HttpException,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { Session, UserSession } from '@thallesp/nestjs-better-auth';
 import { UsersService } from './users.service';
@@ -20,6 +21,7 @@ import {
   FriendshipWithUsers,
 } from '../shared';
 import { User } from 'better-auth';
+import { NotFoundError, throwError } from 'rxjs';
 
 @Controller('users')
 export class UsersController {
