@@ -73,7 +73,6 @@ export default function LoginPage() {
             className="w-full border p-2 rounded"
             onChange={(e) => setPassword(e.target.value)}
           />
-
           <button
             onClick={handleSubmit}
             className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"

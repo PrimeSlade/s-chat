@@ -23,6 +23,8 @@ export function FriendBox({ user, variant }: FriendBoxProps) {
   //   idle: "bg-gray-500",
   // };
 
+  console.log(user);
+
   return (
     <div className="p-4 rounded-lg cursor-pointer transition-colors flex items-center space-x-4 border">
       <div className="relative">

@@ -1,6 +1,7 @@
 import { axiosInstance } from "../axios";
 import {
   Friendship,
+  FriendshipWithSenders,
   FriendshipWithUsers,
   ResponseFormat,
   UpdateUsernameDto,
@@ -22,12 +23,12 @@ const getFriends = async (): Promise<
 };
 
 const getStrangers = async (): Promise<
-  ResponseFormat<Friendship[]> | undefined
+  ResponseFormat<FriendshipWithSenders[]> | undefined
 > => {
   try {
-    const { data } = await axiosInstance.get<ResponseFormat<Friendship[]>>(
-      "/users/strangers"
-    );
+    const { data } = await axiosInstance.get<
+      ResponseFormat<FriendshipWithSenders[]>
+    >("/users/strangers");
     return data;
   } catch (error: any) {
     console.log(error);
@@ -51,4 +52,18 @@ const patchUserName = async (
   }
 };
 
-export { getFriends, getStrangers, patchUserName };
+const addFriend = async (inputData: { username: string }) => {
+  try {
+    const { data } = await axiosInstance.post(
+      "/users/request-by-username",
+      inputData
+    );
+
+    return data;
+  } catch (error: any) {
+    console.log(error.response.data);
+    throw new Error(error.response.data.message);
+  }
+};
+
+export { getFriends, getStrangers, patchUserName, addFriend };

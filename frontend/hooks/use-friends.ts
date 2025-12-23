@@ -9,7 +9,7 @@ export const useFriends = () => {
 };
 
 export const useStrangers = () => {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ["strangers"],
     queryFn: getStrangers,
   });
