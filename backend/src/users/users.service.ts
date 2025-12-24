@@ -77,12 +77,22 @@ export class UsersService {
   }
 
   //Accept
-  async acceptUser(receiverId: string, senderId: string): Promise<Friendship> {
-    return this.usersRepository.acceptUser(receiverId, senderId);
+  async acceptUser(myId: string, senderId: string): Promise<Friendship> {
+    return this.usersRepository.acceptUser(myId, senderId);
   }
 
+  //Decline
+  async declineUser(myId: string, senderId: string): Promise<Friendship> {
+    return this.usersRepository.declineUser(myId, senderId);
+  }
+
+  //Unfriend
+  // async unfriendUser(myId: string): Promise<Friendship> {
+  //   const friend = await this.usersRepository.findFriends(myId);
+  // }
+
   //Block
-  async blockUser(receiverId: string, senderId: string): Promise<Friendship> {
-    return this.usersRepository.blockUser(receiverId, senderId);
+  async blockUser(myId: string, senderId: string): Promise<Friendship> {
+    return this.usersRepository.blockUser(myId, senderId);
   }
 }

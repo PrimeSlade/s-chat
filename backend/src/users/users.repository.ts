@@ -65,12 +65,12 @@ export class UsersRepository {
     });
   }
 
-  async acceptUser(receiverId: string, senderId: string): Promise<Friendship> {
+  async acceptUser(myId: string, senderId: string): Promise<Friendship> {
     return this.prismaService.friendship.update({
       where: {
         senderId_receiverId: {
           senderId,
-          receiverId,
+          receiverId: myId,
         },
       },
       data: {
@@ -78,6 +78,30 @@ export class UsersRepository {
       },
     });
   }
+
+  async declineUser(myId: string, senderId: string): Promise<Friendship> {
+    return this.prismaService.friendship.delete({
+      where: {
+        senderId_receiverId: {
+          senderId,
+          receiverId: myId,
+        },
+        status: 'PENDING',
+      },
+    });
+  }
+
+  // async unfriendUser(myId: string, friendId: string): Promise<FriendStatus> {
+  //   return this.prismaService.friendship.delete({
+  //     where: {
+  //       status: 'ACCEPTED',
+  //       OR: [
+  //         { senderId: myId, receiverId: friendId },
+  //         { senderId: friendId, receiverId: myId },
+  //       ],
+  //     },
+  //   });
+  // }
 
   async blockUser(receiverId: string, senderId: string): Promise<Friendship> {
     return this.prismaService.friendship.update({

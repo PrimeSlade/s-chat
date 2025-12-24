@@ -1,4 +1,13 @@
-import { Controller, Get, Body, Patch, Req, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Req,
+  Post,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { Session, UserSession } from '@thallesp/nestjs-better-auth';
 import { UsersService } from './users.service';
 import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
@@ -60,7 +69,7 @@ export class UsersController {
   //   return { message: 'User deleted successfully' };
   // }
 
-  @Post('/request-by-username')
+  @Post('request-by-username')
   async addFriend(
     @Body() body: { username: string },
     @Session() session: UserSession,
@@ -74,13 +83,29 @@ export class UsersController {
     return { data: addedUser, message: 'User added successfully' };
   }
 
-  @Post('/accept-friends')
+  @Patch('friends/:userId/accept')
   async acceptFriend(
-    @Body() body: { id: string },
+    @Param('userId') userId: string,
     @Session() session: UserSession,
   ): Promise<ResponseType<Friendship>> {
-    const user = await this.usersService.acceptUser(session.user.id, body.id);
+    const user = await this.usersService.acceptUser(session.user.id, userId);
 
     return { data: user, message: 'User accepted successfully' };
   }
+
+  @Delete('friends/:userId/decline')
+  async declineFriend(
+    @Param('userId') userId: string,
+    @Session() session: UserSession,
+  ): Promise<ResponseType<Friendship>> {
+    const user = await this.usersService.declineUser(session.user.id, userId);
+
+    return { data: user, message: 'User declined successfully' };
+  }
+
+  // @Delete('friends/:userId/unfriend')
+  // async unfriend(
+  //   @Param('userId') userId:string,
+  //   @Session() Session: UserSession
+  // )
 }
