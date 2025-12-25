@@ -1,4 +1,5 @@
 "use client";
+import { ChatList } from "../chat-list/chat-list";
 import {
   Sidebar,
   SidebarContent,
@@ -19,8 +20,8 @@ export function AppSidebar() {
         <h1>Hi, {session!.user.name}</h1>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Chat</SidebarGroupLabel>
+        <SidebarGroup className="p-0">
+          <ChatList />
         </SidebarGroup>
         <SidebarGroup />
       </SidebarContent>
