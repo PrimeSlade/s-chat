@@ -21,7 +21,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 w-screen">
         <div className="flex justify-between items-center">
           <NavBar />
           <AddFriendDialog />
