@@ -21,7 +21,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
       }
     >
       <AppSidebar />
-      <main className="p-5">{children}</main>
+      <main className="px-5 w-full">{children}</main>
     </SidebarProvider>
   );
 }

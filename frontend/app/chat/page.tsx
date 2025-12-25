@@ -13,17 +13,13 @@ const Page = () => {
     return <div>Not signed in</div>;
   }
 
-  if (!session.user.username) {
-    router.push("/username");
-  }
+  // if (!session.user.username) {
+  //   router.push("/username");
+  // }
 
   return (
-    <div>
-      <h1>Hi, {session.user.name}</h1>
-      <p>Your email is: {session.user.email}</p>
-      <p>User ID: {session.user.id}</p>
-      {/* for testing */}
-      <p>Username: {session.user.username}</p>
+    <div className="flex h-screen items-center justify-center">
+      <p className="text-muted-foreground">Select someone to start chatting</p>
     </div>
   );
 };

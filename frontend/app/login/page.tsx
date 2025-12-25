@@ -38,7 +38,7 @@ export default function LoginPage() {
           password,
         },
         {
-          onSuccess: () => router.push("/dashboard"),
+          onSuccess: () => router.push("/chat"),
           onError: (ctx) => alert(ctx.error.message),
         }
       );
