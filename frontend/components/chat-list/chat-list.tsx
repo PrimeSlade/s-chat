@@ -1,50 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChatItem } from "./chat-item";
 import { getInitials } from "@/lib/utils";
+import { RoomParticipantWithRoom } from "@backend/shared";
+import { useRoomByUserId, useRooms } from "@/hooks/use-rooms";
+import { ChatItemSkeleton } from "./chat-skeletons";
+import { useFriends, useUserById } from "@/hooks/use-friends";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 
-// 3. TypeScript Types
-type RoomParticipantWithRelations = {
-  userId: string;
-  roomId: string;
-  joinedAt: Date;
-  lastReadAt: Date;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    image?: string | null;
-  };
-  room: {
-    id: string;
-    name: string | null;
-    type: "DIRECT" | "GROUP";
-    createdAt: Date;
-    updatedAt: Date;
-    messages: {
-      id: string;
-      content: string;
-      createdAt: Date;
-      senderId: string;
-      roomId: string;
-    }[];
-  };
+// This is a mock ID for the currently logged-in user.
+// In a real app, you'd get this from your auth context.
+const currentUserId = "user-c";
+
+// MOCK DATA STRUCTURE based on backend type
+const mockUsers = {
+  "user-c": { id: "user-c", name: "You", image: null },
+  "user-a": {
+    id: "user-a",
+    name: "Alice Wonder",
+    image: "https://github.com/shadcn.png",
+  },
+  "user-b": { id: "user-b", name: "Bob Builder", image: null },
+  "user-d": {
+    id: "user-d",
+    name: "Design Team",
+    image: "https://github.com/vercel.png",
+  },
 };
 
-// MOCK DATA STRUCTURE
-const mockChatData: RoomParticipantWithRelations[] = [
+const mockChatData: RoomParticipantWithRoom[] = [
+  // Chat with Alice
   {
-    userId: "user-1",
+    userId: "user-c",
     roomId: "room-1",
     joinedAt: new Date("2024-12-20T10:00:00"),
     lastReadAt: new Date("2024-12-25T17:00:00"),
-    user: {
-      id: "user-1",
-      name: "Alice Wonder",
-      email: "alice@example.com",
-      image: "https://github.com/shadcn.png",
-    },
     room: {
       id: "room-1",
       name: null,
@@ -56,31 +49,27 @@ const mockChatData: RoomParticipantWithRelations[] = [
           id: "msg-1",
           content: "Hey! How are you doing?",
           createdAt: new Date("2024-12-25T18:04:00"),
-          senderId: "user-1",
+          senderId: "user-a",
           roomId: "room-1",
         },
+      ],
+      participants: [
         {
-          id: "msg-2",
-          content:
-            "Want to grab coffee later? It's on me this time, I promise!",
-          createdAt: new Date("2024-12-25T18:04:30"),
-          senderId: "user-1",
+          userId: "user-a",
           roomId: "room-1",
+          joinedAt: new Date("2024-12-20T10:00:00"),
+          lastReadAt: new Date("2024-12-25T18:04:00"),
+          user: mockUsers["user-a"],
         },
       ],
     },
   },
+  // Chat with Bob
   {
-    userId: "user-2",
+    userId: "user-c",
     roomId: "room-2",
     joinedAt: new Date("2024-12-24T10:00:00"),
     lastReadAt: new Date("2024-12-25T17:39:00"),
-    user: {
-      id: "user-2",
-      name: "Bob Builder",
-      email: "bob@example.com",
-      image: null,
-    },
     room: {
       id: "room-2",
       name: null,
@@ -92,23 +81,27 @@ const mockChatData: RoomParticipantWithRelations[] = [
           id: "msg-3",
           content: "Can we fix it?",
           createdAt: new Date("2024-12-25T17:39:00"),
-          senderId: "user-2",
+          senderId: "user-b",
           roomId: "room-2",
+        },
+      ],
+      participants: [
+        {
+          userId: "user-b",
+          roomId: "room-2",
+          joinedAt: new Date("2024-12-24T10:00:00"),
+          lastReadAt: new Date("2024-12-25T17:39:00"),
+          user: mockUsers["user-b"],
         },
       ],
     },
   },
+  // Group Chat
   {
-    userId: "user-3",
+    userId: "user-c",
     roomId: "room-3",
     joinedAt: new Date("2024-12-23T10:00:00"),
     lastReadAt: new Date("2024-12-25T16:00:00"),
-    user: {
-      id: "user-3",
-      name: "Design Team",
-      email: "design@example.com",
-      image: "https://github.com/vercel.png",
-    },
     room: {
       id: "room-3",
       name: "Design Team",
@@ -120,23 +113,27 @@ const mockChatData: RoomParticipantWithRelations[] = [
           id: "msg-4",
           content: "The new mockups look great!",
           createdAt: new Date("2024-12-25T17:09:00"),
-          senderId: "user-3",
+          senderId: "user-d",
           roomId: "room-3",
+        },
+      ],
+      participants: [
+        {
+          userId: "user-d",
+          roomId: "room-3",
+          joinedAt: new Date("2024-12-23T10:00:00"),
+          lastReadAt: new Date("2024-12-25T17:09:00"),
+          user: mockUsers["user-d"],
         },
       ],
     },
   },
+  // Empty Room
   {
-    userId: "user-4",
+    userId: "user-c",
     roomId: "room-4",
     joinedAt: new Date("2024-12-23T10:00:00"),
     lastReadAt: new Date("2024-12-25T18:00:00"),
-    user: {
-      id: "user-4",
-      name: "Empty Room",
-      email: "empty@example.com",
-      image: null,
-    },
     room: {
       id: "room-4",
       name: "Empty Room",
@@ -144,53 +141,91 @@ const mockChatData: RoomParticipantWithRelations[] = [
       createdAt: new Date("2024-12-23T10:00:00"),
       updatedAt: new Date("2024-12-24T11:09:00"),
       messages: [],
+      participants: [],
     },
   },
 ];
 
 export function ChatList() {
+  const { userId } = useParams();
+
+  const router = useRouter();
+
   const [activeRoomId, setActiveRoomId] = useState<string | null>("room-1");
+
+  const { data: roomsData, isLoading: isRoomsLoading } = useRooms();
+
+  const { data: userData } = useUserById(userId as string);
 
   const handleItemClick = (roomId: string) => {
     setActiveRoomId(roomId);
     console.log(`Entering room: ${roomId}`);
   };
 
-  const sortedChats = [...mockChatData].sort(
-    (a, b) => b.room.updatedAt.getTime() - a.room.updatedAt.getTime()
-  );
+  if (!userId && roomsData?.data && roomsData.data.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4 text-center">
+        <h3 className="text-lg font-semibold text-muted-foreground">
+          No chats yet
+        </h3>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Add some friends to start a conversation.
+        </p>
+        <Button asChild variant={"outline"}>
+          <Link href="/friends">Find Friends</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-1 p-2">
-      {sortedChats.map((participant) => {
-        const { room, user, lastReadAt } = participant;
+      {userId && userData?.data && (
+        <ChatItem
+          key={userData.data.id}
+          roomId={userData.data.id}
+          name={userData.data.name}
+          lastMessage="Click to start a conversation"
+          initials={getInitials(userData.data.name)}
+          avatarUrl={userData.data.image || undefined}
+          isActive={activeRoomId === userData.data.id}
+          onClick={() => handleItemClick(userData.data.id)}
+          timestamp={new Date()}
+          unreadCount={0}
+        />
+      )}
+      {roomsData?.data.map((participant) => {
+        const { room } = participant;
 
-        //last message
-        const lastMessage =
-          room.messages.length > 0
-            ? room.messages[room.messages.length - 1]
-            : null;
+        const lastMessage = room.messages?.[0];
 
-        //calc unread count
-        const unreadCount = room.messages.filter(
-          (msg) => new Date(msg.createdAt) > new Date(lastReadAt)
-        ).length;
+        let displayName = room.name || "Unknown";
+        let avatarUrl: string | undefined;
 
-        const displayName = room.type === "GROUP" ? room.name : user.name;
+        if (room.type === "DIRECT") {
+          const otherParticipant = room.participants[0];
+          if (otherParticipant) {
+            displayName = otherParticipant.user.name!;
+            avatarUrl = otherParticipant.user.image || undefined;
+          } else {
+            displayName = "Unknown User";
+          }
+        }
+        // For GROUP chats, you could add a group avatar logic here if needed
+        // else { avatarUrl = room.image }
 
-        //Avatar fallback
-        const initials = getInitials(displayName || "");
+        const initials = getInitials(displayName);
 
         return (
           <ChatItem
             key={room.id}
             roomId={room.id}
-            name={displayName || "Unknown"}
+            name={displayName}
             lastMessage={lastMessage?.content || "No messages yet"}
-            timestamp={room.updatedAt}
-            unreadCount={unreadCount}
+            timestamp={new Date(room.updatedAt)}
+            unreadCount={0}
             initials={initials}
-            avatarUrl={user.image || undefined}
+            avatarUrl={avatarUrl}
             isActive={activeRoomId === room.id}
             onClick={handleItemClick}
           />

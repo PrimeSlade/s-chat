@@ -18,6 +18,7 @@ import {
   unfriend,
 } from "@/lib/api/friends";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export type Status = "online" | "away" | "idle";
 
@@ -74,11 +75,7 @@ export function FriendBox({ user, variant }: FriendBoxProps) {
     mutations[type].mutate({ id: user.id });
   };
 
-  // const statusClasses = {
-  //   online: "bg-green-500",
-  //   away: "bg-yellow-500",
-  //   idle: "bg-gray-500",
-  // };
+  const router = useRouter();
 
   return (
     <div className="p-4 rounded-lg cursor-pointer transition-colors flex items-center space-x-4 border">
@@ -105,7 +102,13 @@ export function FriendBox({ user, variant }: FriendBoxProps) {
       </div>
       {variant === "friend" && (
         <div>
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              router.push(`/chat/dm/${user.id}`);
+            }}
+          >
             <MessageSquare className="h-4 w-4" />
           </Button>
           <DropdownMenu>
@@ -118,7 +121,9 @@ export function FriendBox({ user, variant }: FriendBoxProps) {
               <DropdownMenuItem onClick={() => handleClick("unfriendMutation")}>
                 Unfriend
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleClick("blockUserMutation")}>
+              <DropdownMenuItem
+                onClick={() => handleClick("blockUserMutation")}
+              >
                 Block
               </DropdownMenuItem>
             </DropdownMenuContent>

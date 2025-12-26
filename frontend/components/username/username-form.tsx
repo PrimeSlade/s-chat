@@ -72,7 +72,7 @@ export function UsernameForm() {
           )}
         />
       </FieldGroup>
-      <Button type="submit" className="w-full btn-primary">
+      <Button type="submit" className="w-full">
         Claim Username
       </Button>
     </form>

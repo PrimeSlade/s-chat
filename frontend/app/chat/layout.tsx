@@ -1,16 +1,9 @@
-import { AddFriendDialog } from "@/components/people/add-friend-dialog";
-import NavBar from "@/components/navbar/nav-bar";
-import { getFriends, getStrangers } from "@/lib/api/friends";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
 import React, { ReactNode } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/sidebar/app-sidebar";
+import ChatNavBar from "@/components/navbar/chat-nav-bar";
 
-export default async function Layout({ children }: { children: ReactNode }) {
+export default function Layout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider
       style={
@@ -21,7 +14,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
       }
     >
       <AppSidebar />
-      <main className="px-5 w-full">{children}</main>
+      <main className="w-full">{children}</main>
     </SidebarProvider>
   );
 }
