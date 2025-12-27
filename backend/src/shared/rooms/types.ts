@@ -1,5 +1,7 @@
 import { Prisma } from 'generated/prisma/client';
 
+export type { Room } from 'generated/prisma/client';
+
 export type RoomParticipantWithRoom = Prisma.RoomParticipantGetPayload<{
   include: {
     room: {
