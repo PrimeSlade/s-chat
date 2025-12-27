@@ -151,7 +151,9 @@ export function ChatList() {
 
   const router = useRouter();
 
-  const [activeRoomId, setActiveRoomId] = useState<string | null>("room-1");
+  const [activeRoomId, setActiveRoomId] = useState<string | null>(
+    userId as string
+  );
 
   const { data: roomsData, isLoading: isRoomsLoading } = useRooms();
 
