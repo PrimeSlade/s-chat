@@ -9,10 +9,12 @@ import * as z from "zod";
 import { createDirectRoom } from "@/lib/api/rooms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { createMessage } from "@/lib/api/messages";
 
 interface ChatInputProps {
   isGhostMode?: boolean;
   userId?: string;
+  roomId?: string;
 }
 
 const FormSchema = z.object({
@@ -21,17 +23,28 @@ const FormSchema = z.object({
   }),
 });
 
-export default function ChatInput({ isGhostMode, userId }: ChatInputProps) {
+export default function ChatInput({
+  isGhostMode,
+  userId,
+  roomId,
+}: ChatInputProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const { mutate: directRoomMutate } = useMutation({
     mutationFn: createDirectRoom,
     onSuccess: (data) => {
-      /* handle success */
-      console.log(data);
       router.replace(`/chat/${data!.data.id}`);
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
+    },
+  });
+
+  const { mutate: createMessageMutate } = useMutation({
+    mutationFn: createMessage,
+    onSuccess: (data) => {
+      console.log(data);
+      // router.replace(`/chat/${data!.data.id}`);
+      // queryClient.invalidateQueries({ queryKey: ["rooms"] });
     },
   });
 
@@ -51,10 +64,8 @@ export default function ChatInput({ isGhostMode, userId }: ChatInputProps) {
     if (isGhostMode && userId) {
       directRoomMutate({ content: data.message, otherId: userId });
     } else {
+      createMessageMutate({ content: data.message, roomId });
     }
-
-    // Handle message send logic here
-    console.log("Sending message:", data.message);
   }
 
   return (

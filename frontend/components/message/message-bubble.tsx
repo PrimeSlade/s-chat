@@ -45,7 +45,7 @@ export default function MessageBubble({
         className={cn(
           "max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm",
           isMine
-            ? "bg-black text-white rounded-br-none" // My Style
+            ? "bg-black text-white rounded-br-none " // My Style
             : "bg-gray-100 text-gray-900 rounded-bl-none" // Their Style
         )}
       >

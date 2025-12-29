@@ -157,9 +157,8 @@ export function ChatList() {
 
   const { data: userData } = useUserById(userId as string);
 
-  const handleItemClick = (roomId: string) => {
-    router.push(`/chat/${roomId}`);
-    console.log(`Entering room: ${roomId}`);
+  const handleItemClick = (url: string) => {
+    router.push(url);
   };
 
   if (!userId && roomsData?.data && roomsData.data.length === 0) {
@@ -180,6 +179,7 @@ export function ChatList() {
 
   return (
     <div className="flex flex-col gap-1 p-2">
+      {/* Ghost Room */}
       {userId && userData?.data && (
         <ChatItem
           key={userData.data.id}
@@ -188,12 +188,14 @@ export function ChatList() {
           lastMessage="Click to start a conversation"
           initials={getInitials(userData.data.name)}
           avatarUrl={userData.data.image || undefined}
-          isActive={activeRoomId === userData.data.id}
-          onClick={() => handleItemClick(userData.data.id)}
+          isActive={!activeRoomId}
+          onClick={() => handleItemClick(`/chat/dm/${userData.data.id}`)}
           timestamp={new Date()}
           unreadCount={0}
         />
       )}
+
+      {/* Rooms */}
       {roomsData?.data.map((participant) => {
         const { room } = participant;
 
@@ -227,7 +229,7 @@ export function ChatList() {
             initials={initials}
             avatarUrl={avatarUrl}
             isActive={activeRoomId === room.id}
-            onClick={handleItemClick}
+            onClick={() => handleItemClick(`/chat/${room.id}`)}
           />
         );
       })}

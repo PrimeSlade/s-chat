@@ -1,10 +1,12 @@
 "use client";
-import React from "react";
 import ChatHeader from "./chat-header";
 import { useUserById } from "@/hooks/use-friends";
-import { useRoomByUserId } from "@/hooks/use-rooms";
+import { useMyRoomByRoomId, useRoomByUserId } from "@/hooks/use-rooms";
 import ChatInput from "./chat-input";
 import { MessageList } from "../message/message-list";
+import { useEffect, useState } from "react";
+import { socket } from "@/lib/socket";
+import { getInitials } from "@/lib/utils";
 
 interface ChatWindowProps {
   roomId?: string;
@@ -18,9 +20,24 @@ export function ChatWindow({
   isGhostMode = false,
 }: ChatWindowProps) {
   const { data: ghostUser } = useUserById(userId!);
-  // const { data: roomData } = useRoomByUserId(roomId!);
+  const { data: roomData } = useMyRoomByRoomId(roomId!);
 
-  const messages = [
+  useEffect(() => {
+    console.log("Socket connected:", socket.connected);
+    console.log("Socket ID:", socket.id);
+
+    const handleNewMessage = (data: any) => {
+      console.log("✅ Received new_message:", data);
+    };
+
+    socket.on("new_message", handleNewMessage);
+
+    return () => {
+      socket.off("new_message", handleNewMessage);
+    };
+  }, []);
+
+  const mockMessages = [
     {
       id: "1",
       content: "Hey! How are you?",
@@ -95,27 +112,50 @@ export function ChatWindow({
     },
   ];
 
-  let name;
+  let name = roomData?.data.room.name || "Unknown";
   let image;
+
+  // let displayName = room.name || "Unknown";
+  // let avatarUrl: string | undefined;
+
+  // if (room.type === "DIRECT") {
+  //   const otherParticipant = room.participants[0];
+  //   if (otherParticipant) {
+  //     displayName = otherParticipant.user.name!;
+  //     avatarUrl = otherParticipant.user.image || undefined;
+  //   } else {
+  //     displayName = "Unknown User";
+  //   }
+  // }
 
   if (isGhostMode && ghostUser) {
     name = ghostUser?.data.name;
     image = ghostUser?.data.image;
   } else {
-    // name = roomData?.data.room.participants[0].user.name;
-    // image = roomData?.data.room.participants[0].user.image;
+    if (roomData?.data.room.type === "DIRECT") {
+      const otherParticipant = roomData.data.room.participants[0];
+      if (otherParticipant) {
+        name = otherParticipant.user.name;
+        image = otherParticipant.user.image;
+      } else {
+        name = "Unknown User";
+      }
+    } else {
+      image =
+        roomData?.data.room.image || getInitials(roomData?.data.room.name!);
+    }
   }
 
   return (
     <div className="flex h-screen flex-col">
       {/* Header */}
       <div className="border-b">
-        <ChatHeader />
+        <ChatHeader name={name!} image={image!} />
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {messages.length > 0 ? (
-          <MessageList messages={messages} />
+        {mockMessages.length > 0 ? (
+          <MessageList messages={mockMessages} />
         ) : (
           <div className="h-full flex items-center justify-center text-gray-400">
             {isGhostMode ? "Start a new conversation" : "No messages yet"}
@@ -125,7 +165,7 @@ export function ChatWindow({
 
       {/* Input at bottom */}
       <div className="border-t">
-        <ChatInput isGhostMode userId={userId} />
+        <ChatInput isGhostMode userId={userId} roomId={roomId} />
       </div>
     </div>
   );

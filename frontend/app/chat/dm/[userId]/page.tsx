@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 export default function DmPage() {
-  const { userId, roomId } = useParams();
+  const { userId } = useParams();
 
   const router = useRouter();
 
@@ -24,11 +24,7 @@ export default function DmPage() {
 
   return (
     <div>
-      <ChatWindow
-        isGhostMode={true}
-        userId={userId as string}
-        roomId={roomId as string}
-      />
+      <ChatWindow isGhostMode={true} userId={userId as string} />
     </div>
   );
 }

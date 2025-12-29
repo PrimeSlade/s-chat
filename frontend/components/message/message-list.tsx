@@ -17,7 +17,7 @@ export function MessageList({ messages }: { messages: any }) {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((msg, index) => {
+      {messages.map((msg: any, index: any) => {
         // Logic: Is this message sent by me?
         const isMine = msg.senderId === session?.user?.id;
 
