@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { Message } from '../shared';
 
 @Injectable()
 export class MessagesRepository {
@@ -9,7 +10,7 @@ export class MessagesRepository {
   async createMessage(
     data: { content: string; senderId: string; roomId: string },
     trx?: Prisma.TransactionClient,
-  ) {
+  ): Promise<Message> {
     const db = trx || this.prismaService;
 
     return db.message.create({
