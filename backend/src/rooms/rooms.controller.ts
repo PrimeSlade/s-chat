@@ -12,7 +12,6 @@ import { RoomsService } from './rooms.service';
 
 import { UserSession } from '@thallesp/nestjs-better-auth';
 import {
-  ResponseType,
   Room,
   RoomParticipantWithRoom,
   RoomParticipantWithRoomByUserId,
@@ -20,6 +19,7 @@ import {
   createDirectRoomSchema,
 } from 'src/shared';
 import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
+import { ControllerResponse } from 'src/common/types/responce.type';
 
 @Controller('rooms')
 export class RoomsController {
@@ -30,7 +30,7 @@ export class RoomsController {
     @Body(new ZodValidationPipe(createDirectRoomSchema))
     body: CreateDirectRoomDto,
     @Session() session: UserSession,
-  ): Promise<ResponseType<Room | RoomParticipantWithRoomByUserId>> {
+  ): Promise<ControllerResponse<Room | RoomParticipantWithRoomByUserId>> {
     const room = await this.roomsService.createDirectRoom(
       body,
       session.user.id,
@@ -42,7 +42,7 @@ export class RoomsController {
   @Get('me')
   async getRooms(
     @Session() session: UserSession,
-  ): Promise<ResponseType<RoomParticipantWithRoom[]>> {
+  ): Promise<ControllerResponse<RoomParticipantWithRoom[]>> {
     const rooms = await this.roomsService.getRooms(session.user.id);
 
     return { data: rooms, message: 'Rooms fetched successfully' };
@@ -65,7 +65,7 @@ export class RoomsController {
   async getRoomByUserId(
     @Param('userId') userId: string,
     @Session() session: UserSession,
-  ): Promise<ResponseType<RoomParticipantWithRoomByUserId | null>> {
+  ): Promise<ControllerResponse<RoomParticipantWithRoomByUserId | null>> {
     const room = await this.roomsService.getRoomByUserId(
       session.user.id,
       userId,

@@ -42,6 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { roomId: string },
     @ConnectedSocket() client: Socket,
   ) {
+    console.log(`Client ${client.id} leaving room: ${data.roomId}`);
     client.leave(data.roomId);
   }
 }

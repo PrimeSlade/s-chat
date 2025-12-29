@@ -5,11 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
-
-export interface Pagination {
-  nextCursor: number | null;
-  hasNextPage: boolean;
-}
+import { Pagination } from '../types/responce.type';
 
 export interface ResponseFormat<T> {
   status: 'success';

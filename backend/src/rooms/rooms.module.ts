@@ -9,5 +9,6 @@ import { ChatModule } from 'src/chat/chat.module';
   imports: [MessagesModule, ChatModule],
   controllers: [RoomsController],
   providers: [RoomsService, RoomsReposiory],
+  exports: [RoomsReposiory],
 })
 export class RoomsModule {}

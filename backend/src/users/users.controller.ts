@@ -14,11 +14,11 @@ import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 import {
   updateUsernameSchema,
   UpdateUsernameDto,
-  ResponseType,
   Friendship,
   FriendshipWithUsers,
 } from '../shared';
 import { User } from 'better-auth';
+import { ControllerResponse } from 'src/common/types/responce.type';
 
 @Controller('users')
 export class UsersController {
@@ -26,14 +26,14 @@ export class UsersController {
 
   //Type Error
   @Get('me')
-  getProfile(@Session() session: UserSession): ResponseType<User> {
+  getProfile(@Session() session: UserSession): ControllerResponse<User> {
     return { data: session.user, message: 'User fetched successfully' };
   }
 
   @Get('friends')
   async getFriends(
     @Session() session: UserSession,
-  ): Promise<ResponseType<FriendshipWithUsers[]>> {
+  ): Promise<ControllerResponse<FriendshipWithUsers[]>> {
     const friends = await this.usersService.findFriends(session.user.id);
 
     return { data: friends, message: 'Friends fetched successfully' };
@@ -42,7 +42,7 @@ export class UsersController {
   @Get('strangers')
   async getStrangers(
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship[]>> {
+  ): Promise<ControllerResponse<Friendship[]>> {
     const strangers = await this.usersService.findPendingStrangers(
       session.user.id,
     );
@@ -53,7 +53,7 @@ export class UsersController {
   @Get(':userId')
   async getUserById(
     @Param('userId') userId: string,
-  ): Promise<ResponseType<User>> {
+  ): Promise<ControllerResponse<User>> {
     const user = await this.usersService.findUserById(userId);
 
     return { data: user, message: 'User fetched successfully' };
@@ -63,7 +63,7 @@ export class UsersController {
   async updateUsername(
     @Body(new ZodValidationPipe(updateUsernameSchema)) body: UpdateUsernameDto,
     @Session() session: UserSession,
-  ): Promise<ResponseType<User>> {
+  ): Promise<ControllerResponse<User>> {
     const user = await this.usersService.updateUsername(
       session.user.id,
       body.username,
@@ -72,7 +72,7 @@ export class UsersController {
   }
 
   // @Patch('me')
-  // async softDeleteUSer(@Req() req): Promise<ResponseType<null>> {
+  // async softDeleteUSer(@Req() req): Promise<ControllerResponse<null>> {
   //   await this.usersService.softDeleteUser(req.user.id);
 
   //   return { message: 'User deleted successfully' };
@@ -82,7 +82,7 @@ export class UsersController {
   async addFriend(
     @Body() body: { username: string },
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship>> {
+  ): Promise<ControllerResponse<Friendship>> {
     const addedUser = await this.usersService.addUser(
       body.username,
       session.user.id,
@@ -95,7 +95,7 @@ export class UsersController {
   async acceptFriend(
     @Param('userId') userId: string,
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship>> {
+  ): Promise<ControllerResponse<Friendship>> {
     const friendShip = await this.usersService.acceptUser(
       session.user.id,
       userId,
@@ -108,7 +108,7 @@ export class UsersController {
   async declineFriend(
     @Param('userId') userId: string,
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship>> {
+  ): Promise<ControllerResponse<Friendship>> {
     const friendShip = await this.usersService.declineUser(
       session.user.id,
       userId,
@@ -121,7 +121,7 @@ export class UsersController {
   async unfriend(
     @Param('userId') userId: string,
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship>> {
+  ): Promise<ControllerResponse<Friendship>> {
     const friendShip = await this.usersService.unfriendUser(
       session.user.id,
       userId,
@@ -134,7 +134,7 @@ export class UsersController {
   async blockUser(
     @Param('userId') userId: string,
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship>> {
+  ): Promise<ControllerResponse<Friendship>> {
     const friendShip = await this.usersService.blockUser(
       session.user.id,
       userId,
@@ -147,7 +147,7 @@ export class UsersController {
   async unBlockUser(
     @Param('userId') userId: string,
     @Session() session: UserSession,
-  ): Promise<ResponseType<Friendship>> {
+  ): Promise<ControllerResponse<Friendship>> {
     const friendShip = await this.usersService.unBlockUser(
       session.user.id,
       userId,
