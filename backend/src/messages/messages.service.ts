@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MessagesRepository } from './messages.repository';
-import { Message } from 'src/shared';
+import { GetMessagesDto, Message } from 'src/shared';
 import { ChatGateway } from 'src/chat/chat.gateway';
 
 @Injectable()
@@ -9,6 +9,14 @@ export class MessagesService {
     private readonly messagesRepository: MessagesRepository,
     private readonly chatGateway: ChatGateway,
   ) {}
+
+  async getMessages(query: GetMessagesDto): Promise<{
+    messages: Message[];
+    nextCursor: string | null;
+    hasNextPage: boolean;
+  }> {
+    return this.messagesRepository.getMessages(query);
+  }
 
   async createMessage(data: {
     content: string;
