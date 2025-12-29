@@ -16,12 +16,10 @@ import {
   Room,
   RoomParticipantWithRoom,
   RoomParticipantWithRoomByUserId,
-} from 'src/shared';
-import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
-import {
   CreateDirectRoomDto,
   createDirectRoomSchema,
-} from './dto/create-room.dto';
+} from 'src/shared';
+import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 
 @Controller('rooms')
 export class RoomsController {
@@ -48,6 +46,19 @@ export class RoomsController {
     const rooms = await this.roomsService.getRooms(session.user.id);
 
     return { data: rooms, message: 'Rooms fetched successfully' };
+  }
+
+  @Get('me/:roomId')
+  async getMyRoomByRoomId(
+    @Param('roomId') roomId: string,
+    @Session() session: UserSession,
+  ) {
+    const room = await this.roomsService.getMyRoomByRoomId(
+      session.user.id,
+      roomId,
+    );
+
+    return { data: room, message: 'Room fetched successfully' };
   }
 
   @Get(':userId')

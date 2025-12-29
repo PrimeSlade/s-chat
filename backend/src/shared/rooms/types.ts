@@ -53,3 +53,23 @@ export type RoomParticipantWithRoomByUserId = Prisma.RoomParticipantGetPayload<{
     };
   };
 }>;
+
+export type RoomParticipantWithRoomByRoomId = Prisma.RoomParticipantGetPayload<{
+  include: {
+    room: {
+      include: {
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true;
+                name: true;
+                image: true;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+}>;

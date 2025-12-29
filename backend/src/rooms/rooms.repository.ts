@@ -7,6 +7,7 @@ import {
   RoomParticipantWithRoom,
   RoomParticipantWithRoomByUserId,
   Room,
+  RoomParticipantWithRoomByRoomId,
 } from 'src/shared';
 
 @Injectable()
@@ -31,6 +32,34 @@ export class RoomsReposiory {
               take: 1,
               orderBy: { createdAt: 'desc' },
             },
+            participants: {
+              where: {
+                userId: { not: myId },
+              },
+              include: {
+                user: {
+                  select: { id: true, name: true, image: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async findMyRoombyRoomId(
+    myId: string,
+    roomId: string,
+  ): Promise<RoomParticipantWithRoomByRoomId> {
+    return this.prismaService.roomParticipant.findFirstOrThrow({
+      where: {
+        userId: myId,
+        roomId,
+      },
+      include: {
+        room: {
+          include: {
             participants: {
               where: {
                 userId: { not: myId },

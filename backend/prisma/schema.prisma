@@ -109,6 +109,7 @@ model Verification {
 model Room {
   id        String   @id @default(uuid())
   name      String? //for group name
+  image     String? //for group image
   type      RoomType @default(DIRECT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt // Useful for sorting "Recent Chats"
