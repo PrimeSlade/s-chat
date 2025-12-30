@@ -1,13 +1,19 @@
 import { axiosInstance } from "../axios";
-import { ResponseFormat, Message, CreateMessageDto } from "@backend/shared";
+import {
+  ResponseFormat,
+  Message,
+  GetMessagesDto,
+  CreateMessageDto,
+} from "@backend/shared";
 
-const createMessage = async (
-  inputData: CreateMessageDto
-): Promise<ResponseFormat<Message> | undefined> => {
+const createMessage = async ({
+  roomId,
+  content,
+}: CreateMessageDto): Promise<ResponseFormat<Message> | undefined> => {
   try {
     const { data } = await axiosInstance.post<ResponseFormat<Message>>(
-      "/messages",
-      inputData
+      `/messages/room/${roomId}`,
+      { content }
     );
     return data;
   } catch (error: any) {
@@ -16,4 +22,16 @@ const createMessage = async (
   }
 };
 
-export { createMessage };
+const getMessages = async ({ roomId, ...params }: GetMessagesDto) => {
+  try {
+    const { data } = await axiosInstance.get(`/messages/room/${roomId}`, {
+      params,
+    });
+    return data;
+  } catch (error: any) {
+    console.log(error.response.data);
+    throw new Error(error.response.data.message);
+  }
+};
+
+export { createMessage, getMessages };

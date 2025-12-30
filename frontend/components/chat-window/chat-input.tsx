@@ -43,8 +43,7 @@ export default function ChatInput({
     mutationFn: createMessage,
     onSuccess: (data) => {
       console.log(data);
-      // router.replace(`/chat/${data!.data.id}`);
-      // queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      queryClient.invalidateQueries({ queryKey: ["rooms"] });
     },
   });
 
@@ -63,8 +62,8 @@ export default function ChatInput({
 
     if (isGhostMode && userId) {
       directRoomMutate({ content: data.message, otherId: userId });
-    } else {
-      createMessageMutate({ content: data.message, roomId });
+    } else if (roomId) {
+      createMessageMutate({ roomId, content: data.message });
     }
   }
 
