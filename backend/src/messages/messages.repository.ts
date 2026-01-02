@@ -43,12 +43,15 @@ export class MessagesRepository {
   async createMessage(
     data: { content: string; senderId: string; roomId: string },
     trx?: Prisma.TransactionClient,
-  ): Promise<Message> {
+  ): Promise<MessageWithSender> {
     const db = trx || this.prismaService;
 
     return db.message.create({
       data: {
         ...data,
+      },
+      include: {
+        sender: true,
       },
     });
   }

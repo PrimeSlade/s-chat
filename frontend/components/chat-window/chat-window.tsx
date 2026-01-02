@@ -8,6 +8,9 @@ import { useEffect } from "react";
 import { socket } from "@/lib/socket";
 import { getInitials, getRoomDisplay } from "@/lib/utils";
 import { useMessages } from "@/hooks/use-messages";
+import { Spinner } from "../ui/spinner";
+import { useQueryClient } from "@tanstack/react-query";
+import { MessageWithSender, ResponseFormat } from "@backend/shared";
 
 interface ChatWindowProps {
   roomId?: string;
@@ -24,6 +27,8 @@ export function ChatWindow({
     userId!
   );
   const { data: roomData } = useMyRoomByRoomId(roomId!);
+
+  const queryClient = useQueryClient();
 
   const {
     data: messagesData,
@@ -45,8 +50,21 @@ export function ChatWindow({
     console.log("Socket connected:", socket.connected);
     console.log("Socket ID:", socket.id);
 
-    const handleNewMessage = (data: any) => {
-      console.log("✅ Received new_message:", data);
+    const handleNewMessage = (message: ResponseFormat<MessageWithSender>) => {
+      queryClient.setQueryData(["messages", roomId, 20], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          pages: [
+            {
+              ...oldData.pages[0],
+              data: [...oldData.pages[0].data, message.data],
+            },
+            ...oldData.pages.slice(1), //restoring old pages
+          ],
+        };
+      });
     };
 
     socket.on("new_message", handleNewMessage);
@@ -75,8 +93,8 @@ export function ChatWindow({
 
       {isLoading && messages.length === 0 ? (
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="h-full flex items-center justify-center text-gray-400">
-            Loading messages...
+          <div className="h-full flex items-center justify-center">
+            <Spinner className="size-8" />
           </div>
         </div>
       ) : messages.length > 0 ? (
@@ -84,7 +102,7 @@ export function ChatWindow({
           messages={messages}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
-          isFetchingNextPage
+          isFetchingNextPage={isFetchingNextPage}
         />
       ) : (
         <div className="flex-1 overflow-y-auto p-4 space-y-4">

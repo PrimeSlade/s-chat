@@ -55,12 +55,13 @@ export function MessageList({
 
   // Auto-scroll only if user is at bottom
   useEffect(() => {
+    console.log("triggered");
     const container = containerRef.current;
     if (!container) return;
 
     const isAtBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight <
-      50;
+      100;
 
     if (isAtBottom) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });

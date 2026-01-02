@@ -57,7 +57,7 @@ export class MessagesController {
     @Body(new ZodValidationPipe(createMessageBodySchema))
     body: CreateMessageBodyDto,
     @Session() session: UserSession,
-  ): Promise<ControllerResponse<Message>> {
+  ): Promise<ControllerResponse<MessageWithSender>> {
     const message = await this.messagesService.createMessage({
       senderId: session.user.id,
       ...body,

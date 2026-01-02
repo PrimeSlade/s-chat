@@ -21,7 +21,7 @@ export class MessagesService {
     content: string;
     senderId: string;
     roomId: string;
-  }): Promise<Message> {
+  }): Promise<MessageWithSender> {
     const message = await this.messagesRepository.createMessage(data);
 
     this.chatGateway.server

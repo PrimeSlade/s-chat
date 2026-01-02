@@ -42,7 +42,6 @@ export default function ChatInput({
   const { mutate: createMessageMutate } = useMutation({
     mutationFn: createMessage,
     onSuccess: (data) => {
-      console.log(data);
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
     },
   });

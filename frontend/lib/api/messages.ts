@@ -1,7 +1,6 @@
 import { axiosInstance } from "../axios";
 import {
   ResponseFormat,
-  Message,
   GetMessagesDto,
   CreateMessageDto,
   MessageWithSender,
@@ -10,12 +9,13 @@ import {
 const createMessage = async ({
   roomId,
   content,
-}: CreateMessageDto): Promise<ResponseFormat<Message> | undefined> => {
+}: CreateMessageDto): Promise<
+  ResponseFormat<MessageWithSender> | undefined
+> => {
   try {
-    const { data } = await axiosInstance.post<ResponseFormat<Message>>(
-      `/messages/room/${roomId}`,
-      { content }
-    );
+    const { data } = await axiosInstance.post<
+      ResponseFormat<MessageWithSender>
+    >(`/messages/room/${roomId}`, { content });
     return data;
   } catch (error: any) {
     console.log(error.response.data);
