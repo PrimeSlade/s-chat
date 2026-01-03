@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { betterAuth, config } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '../../generated/prisma/client';
+import { jwt } from 'better-auth/plugins';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,8 @@ export const auth = betterAuth({
       },
     },
   },
+  plugins: [jwt()],
+
   emailAndPassword: {
     enabled: true,
   },

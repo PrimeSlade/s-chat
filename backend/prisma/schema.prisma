@@ -129,7 +129,8 @@ model RoomParticipant {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
-  @@id([userId, roomId]) //user can only join same room once
+  //user can only join same room once
+  @@id([userId, roomId])
   @@index([userId])
   @@map("room_participant")
 }
@@ -160,4 +161,14 @@ enum FriendStatus {
 enum RoomType {
   DIRECT
   GROUP
+}
+
+model Jwks {
+  id         String    @id
+  publicKey  String
+  privateKey String
+  createdAt  DateTime
+  expiresAt  DateTime?
+
+  @@map("jwks")
 }

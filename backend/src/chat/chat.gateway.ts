@@ -1,3 +1,5 @@
+import { ForbiddenException, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ConnectedSocket,
   MessageBody,
@@ -7,8 +9,9 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { Server, Socket } from 'socket.io';
+import { RoomGuard } from './guards/rooms.guard';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -20,14 +23,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
+  private readonly baseUrl: string;
+
+  constructor(private configService: ConfigService) {
+    this.baseUrl = this.configService.get<string>('BASE_URL')!;
+  }
+
+  async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
+
+    const token = client.handshake.auth.token;
+
+    if (!token) {
+      client.disconnect();
+      return;
+    }
+
+    try {
+      const JWKS = createRemoteJWKSet(new URL(`${this.baseUrl}/api/auth/jwks`));
+      const { payload } = await jwtVerify(token, JWKS, {
+        issuer: this.baseUrl,
+        audience: this.baseUrl,
+      });
+
+      client.data.user = payload;
+    } catch (error) {
+      // Invalid/Expired token: Immediately disconnect
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
   }
 
+  @UseGuards(RoomGuard)
   @SubscribeMessage('join_room')
   handleJoinRoom(
     @MessageBody() data: { roomId: string },
