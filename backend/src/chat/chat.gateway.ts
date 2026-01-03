@@ -1,4 +1,4 @@
-import { ForbiddenException, UseGuards } from '@nestjs/common';
+import { ForbiddenException, Inject, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   ConnectedSocket,
@@ -12,6 +12,7 @@ import {
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { Server, Socket } from 'socket.io';
 import { RoomGuard } from './guards/rooms.guard';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -25,7 +26,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly baseUrl: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {
     this.baseUrl = this.configService.get<string>('BASE_URL')!;
   }
 
@@ -39,6 +43,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
+    //auth
     try {
       const JWKS = createRemoteJWKSet(new URL(`${this.baseUrl}/api/auth/jwks`));
       const { payload } = await jwtVerify(token, JWKS, {
@@ -51,10 +56,51 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Invalid/Expired token: Immediately disconnect
       client.disconnect();
     }
+
+    const userId = client.data.user.id;
+
+    //checking status
+    const currentCount =
+      (await this.cacheManager.get<number>(`user:${userId}:count`)) || 0;
+
+    const newCount = currentCount + 1;
+
+    await this.cacheManager.set(`user:${userId}:count`, newCount + 1, 0);
+
+    if (newCount === 1) {
+      this.server.emit('user_status', {
+        userId: userId,
+        status: 'online',
+      });
+    }
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
+
+    const userId = client.data.user.id;
+
+    const currentCount =
+      (await this.cacheManager.get<number>(`user:${userId}:count`)) || 0;
+
+    const newCount = Math.max(0, currentCount - 1);
+
+    await this.cacheManager.set(`user:${userId}:count`, newCount, 0);
+
+    if (newCount === 0) {
+      const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+
+      await this.cacheManager.set(
+        `user:${userId}:last_seen`,
+        new Date(),
+        sevenDaysInMs,
+      );
+
+      this.server.emit('user_status', {
+        userId: userId,
+        status: 'offline',
+      });
+    }
   }
 
   @UseGuards(RoomGuard)
