@@ -8,12 +8,12 @@ import { useEffect, useMemo } from "react";
 import { socket } from "@/lib/socket";
 import { getInitials, getRoomDisplay } from "@/lib/utils";
 import { useMessages } from "@/hooks/use-messages";
-import { Spinner } from "../ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { MessageWithSender, ResponseFormat } from "@backend/shared";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { MessageSkeletonLoader } from "./message-skeleton-loader";
+import { ChatHeaderSkeleton } from "../chat-list/chat-skeletons";
 
 interface ChatWindowProps {
   roomId?: string;
@@ -32,7 +32,11 @@ export function ChatWindow({
     userId!
   );
 
-  const { data: roomData, error: fetchRoomError } = useMyRoomByRoomId(roomId!);
+  const {
+    data: roomData,
+    isLoading: isFetchingRoom,
+    error: fetchRoomError,
+  } = useMyRoomByRoomId(roomId!);
 
   const queryClient = useQueryClient();
 
@@ -96,7 +100,8 @@ export function ChatWindow({
     };
   }, []);
 
-  const isLoading = isLoadingMessages || (isGhostMode && isLoadingGhostUser);
+  const isLoading =
+    isLoadingMessages || (isGhostMode && isLoadingGhostUser) || isFetchingRoom;
 
   const { displayName, avatarUrl } =
     isGhostMode && ghostUser
@@ -110,7 +115,11 @@ export function ChatWindow({
     <div className="flex h-screen flex-col">
       {/* Header */}
       <div className="border-b">
-        <ChatHeader name={displayName} image={avatarUrl} />
+        {isLoading ? (
+          <ChatHeaderSkeleton />
+        ) : (
+          <ChatHeader name={displayName} image={avatarUrl} />
+        )}
       </div>
 
       {isLoading && messages.length === 0 ? (

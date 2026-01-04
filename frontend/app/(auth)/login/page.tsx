@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn, signUp } from "@/lib/auth-client"; // Import from your new file
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -10,11 +10,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState(""); // Only for sign up
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const handleGoogleLogin = async () => {
     await signIn.social({
       provider: "google",
-      callbackURL: "http://localhost:3000/chat",
+      callbackURL: `http://localhost:3000${callbackUrl}`,
     });
   };
 
@@ -36,9 +39,10 @@ export default function LoginPage() {
         {
           email,
           password,
+          callbackURL: callbackUrl,
         },
         {
-          onSuccess: () => router.push("/chat"),
+          onSuccess: () => router.push(callbackUrl),
           onError: (ctx) => alert(ctx.error.message),
         }
       );

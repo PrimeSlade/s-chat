@@ -14,7 +14,7 @@ export function ChatItemSkeleton() {
 
 export function ChatHeaderSkeleton() {
   return (
-    <div className="flex items-center gap-4 p-4 border-b">
+    <div className="flex items-center gap-4 p-4">
       <Skeleton className="size-10 rounded-full" />
       <div className="space-y-1">
         <Skeleton className="h-4 w-24" />

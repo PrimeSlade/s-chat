@@ -15,7 +15,7 @@ export default function AuthGuard({
   useEffect(() => {
     if (isPending) return;
 
-    if (!session || error) {
+    if (!session && !error) {
       router.replace(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
     }
   }, [session, isPending, error, router, pathname]);

@@ -1,4 +1,4 @@
-import { ForbiddenException, Inject, UseGuards } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   ConnectedSocket,
@@ -55,6 +55,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (error) {
       // Invalid/Expired token: Immediately disconnect
       client.disconnect();
+      return;
     }
 
     const userId = client.data.user.id;
