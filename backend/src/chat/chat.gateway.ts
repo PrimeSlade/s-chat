@@ -5,6 +5,7 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -20,7 +21,9 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
     origin: '*',
   },
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -33,30 +36,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.baseUrl = this.configService.get<string>('BASE_URL')!;
   }
 
+  afterInit(server: Server) {
+    server.use(async (socket: Socket, next) => {
+      const token = socket.handshake.auth.token;
+
+      if (!token) {
+        return next(new Error('Authentication error: Token missing'));
+      }
+
+      //auth
+      try {
+        const JWKS = createRemoteJWKSet(
+          new URL(`${this.baseUrl}/api/auth/jwks`),
+        );
+        const { payload } = await jwtVerify(token, JWKS, {
+          issuer: this.baseUrl,
+          audience: this.baseUrl,
+        });
+
+        socket.data.user = payload;
+
+        next();
+      } catch (error) {
+        // Invalid/Expired token: Immediately disconnect
+        next(new Error('Authentication error: Invalid token'));
+      }
+    });
+  }
+
   async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
-
-    const token = client.handshake.auth.token;
-
-    if (!token) {
-      client.disconnect();
-      return;
-    }
-
-    //auth
-    try {
-      const JWKS = createRemoteJWKSet(new URL(`${this.baseUrl}/api/auth/jwks`));
-      const { payload } = await jwtVerify(token, JWKS, {
-        issuer: this.baseUrl,
-        audience: this.baseUrl,
-      });
-
-      client.data.user = payload;
-    } catch (error) {
-      // Invalid/Expired token: Immediately disconnect
-      client.disconnect();
-      return;
-    }
 
     const userId = client.data.user.id;
 
