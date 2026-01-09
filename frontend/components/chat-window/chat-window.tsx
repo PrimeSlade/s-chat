@@ -1,6 +1,6 @@
 "use client";
 import ChatHeader from "./chat-header";
-import { useUserById } from "@/hooks/use-friends";
+import { useUserById, useUserLastSeen } from "@/hooks/use-friends";
 import { useMyRoomByRoomId } from "@/hooks/use-rooms";
 import ChatInput from "./chat-input";
 import { MessageList } from "../message/message-list";
@@ -27,6 +27,7 @@ export function ChatWindow({
   isGhostMode = false,
 }: ChatWindowProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: ghostUser, isLoading: isLoadingGhostUser } = useUserById(
     userId!
@@ -37,8 +38,6 @@ export function ChatWindow({
     isLoading: isFetchingRoom,
     error: fetchRoomError,
   } = useMyRoomByRoomId(roomId!);
-
-  const queryClient = useQueryClient();
 
   const {
     data: messagesData,
@@ -103,9 +102,10 @@ export function ChatWindow({
   const isLoading =
     isLoadingMessages || (isGhostMode && isLoadingGhostUser) || isFetchingRoom;
 
-  const { displayName, avatarUrl } =
+  const { displayUserId, displayName, avatarUrl } =
     isGhostMode && ghostUser
       ? {
+          displayUserId: ghostUser.data.id,
           displayName: ghostUser.data.name,
           avatarUrl: ghostUser.data.image ?? getInitials(ghostUser.data.name),
         }
@@ -118,7 +118,11 @@ export function ChatWindow({
         {isLoading ? (
           <ChatHeaderSkeleton />
         ) : (
-          <ChatHeader name={displayName} image={avatarUrl} />
+          <ChatHeader
+            userId={displayUserId}
+            name={displayName}
+            image={avatarUrl}
+          />
         )}
       </div>
 

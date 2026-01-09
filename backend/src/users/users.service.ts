@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import {
@@ -12,10 +13,14 @@ import {
 } from '../shared';
 import { UsersRepository } from './users.repository';
 import { FriendStatus } from 'generated/prisma/enums';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async findUserById(userId: string): Promise<User> {
     return this.usersRepository.findUserById(userId);
@@ -24,6 +29,21 @@ export class UsersService {
   //Find by username
   async findUserByUserName(username: string, myId: string): Promise<User> {
     return this.usersRepository.findUserByUserName(username);
+  }
+
+  async findUserLastSeen(userId: string): Promise<string | null> {
+    const isActive =
+      (await this.cacheManager.get<number>(`user:${userId}:count`)) || 0;
+
+    if (isActive >= 1) {
+      return null;
+    }
+
+    const lastSeen = await this.cacheManager.get<string>(
+      `user:${userId}:last_seen`,
+    );
+
+    return lastSeen || null;
   }
 
   //Update name

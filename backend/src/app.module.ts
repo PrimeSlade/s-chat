@@ -17,7 +17,6 @@ import { CacheableMemory } from 'cacheable';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule.forRoot({ auth }),
-
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],

@@ -48,6 +48,7 @@ export default function ChatInput({
     mutationFn: createMessage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      // queryClient.invalidateQueries({ queryKey: ["messages", roomId, 20] });
       form.reset();
     },
   });

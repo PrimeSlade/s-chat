@@ -102,13 +102,7 @@ export class ChatGateway
     await this.cacheManager.set(`user:${userId}:count`, newCount);
 
     if (newCount === 0) {
-      const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-
-      await this.cacheManager.set(
-        `user:${userId}:last_seen`,
-        new Date(),
-        sevenDaysInMs,
-      );
+      await this.cacheManager.set(`user:${userId}:last_seen`, new Date());
 
       this.server.emit('user_status', {
         userId: userId,

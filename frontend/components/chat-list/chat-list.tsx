@@ -15,7 +15,7 @@ export function ChatList() {
 
   const activeRoomId = roomId;
 
-  const { data: roomsData, isLoading: isRoomsLoading } = useRooms();
+  const { data: roomsData } = useRooms();
 
   const { data: userData } = useUserById(userId as string);
 
@@ -73,7 +73,7 @@ export function ChatList() {
             roomId={room.id}
             name={displayName}
             lastMessage={lastMessage?.content || "No messages yet"}
-            timestamp={new Date(room.updatedAt)}
+            timestamp={new Date(lastMessage.createdAt)}
             unreadCount={0}
             initials={initials}
             avatarUrl={avatarUrl}

@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -12,7 +11,6 @@ async function bootstrap() {
     bodyParser: false,
     cors: true,
   });
-  app.use(cookieParser());
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') ?? 3000;

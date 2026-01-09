@@ -59,6 +59,15 @@ export class UsersController {
     return { data: user, message: 'User fetched successfully' };
   }
 
+  @Get(':userId/last-seen')
+  async getLastSeen(
+    @Param('userId') userId: string,
+  ): Promise<ControllerResponse<string | null>> {
+    const lastSeen = await this.usersService.findUserLastSeen(userId);
+
+    return { data: lastSeen, message: 'User last seen fetched successfully' };
+  }
+
   @Patch('me/username')
   async updateUsername(
     @Body(new ZodValidationPipe(updateUsernameSchema)) body: UpdateUsernameDto,

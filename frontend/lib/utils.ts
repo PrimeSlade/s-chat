@@ -84,6 +84,7 @@ export const getRoomDisplay = (room: RoomLike) => {
   if (room.type === "DIRECT") {
     const otherParticipant = room.participants[0];
     return {
+      displayUserId: otherParticipant.user.id,
       displayName: otherParticipant.user.name ?? "Unknown",
       avatarUrl:
         otherParticipant.user.image ??
@@ -92,6 +93,7 @@ export const getRoomDisplay = (room: RoomLike) => {
   }
 
   return {
+    displayUserId: null,
     displayName: room.name ?? "Unnamed Room",
     avatarUrl: room.image ?? getInitials(room.name ?? "Ar"),
   };
@@ -123,4 +125,30 @@ export const formatDateLabelForChatWindow = (dateStr: Date | string) => {
     day: "numeric",
     year: "numeric",
   });
+};
+
+export const formatlastSeen = (timestamp: Date | string) => {
+  const today = new Date();
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const targetDate = new Date(timestamp);
+
+  const timeStr = targetDate.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+
+  if (isSameDay(today, targetDate)) {
+    return `today at ${timeStr}`;
+  } else if (isSameDay(yesterday, targetDate)) {
+    return `yesterday at ${timeStr}`;
+  }
+
+  return `on ${targetDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })} at ${timeStr}`;
 };

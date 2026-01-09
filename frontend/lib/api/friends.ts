@@ -148,6 +148,20 @@ const getUserById = async (
   }
 };
 
+const getUserLastSeen = async (
+  userId: string
+): Promise<ResponseFormat<string | null> | undefined> => {
+  try {
+    const { data } = await axiosInstance.get<ResponseFormat<string | null>>(
+      `/users/${userId}/last-seen`
+    );
+    return data;
+  } catch (error: any) {
+    console.log(error.response.data);
+    throw new Error(error.response.data.message);
+  }
+};
+
 export {
   getFriends,
   getStrangers,
@@ -158,4 +172,5 @@ export {
   unfriend,
   blockUser,
   getUserById,
+  getUserLastSeen,
 };

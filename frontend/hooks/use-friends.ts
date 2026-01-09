@@ -1,4 +1,9 @@
-import { getFriends, getStrangers, getUserById } from "@/lib/api/friends";
+import {
+  getFriends,
+  getStrangers,
+  getUserById,
+  getUserLastSeen,
+} from "@/lib/api/friends";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export const useFriends = () => {
@@ -19,6 +24,14 @@ export const useUserById = (userId: string) => {
   return useQuery({
     queryKey: ["user", userId],
     queryFn: () => getUserById(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useUserLastSeen = (userId: string) => {
+  return useQuery({
+    queryKey: ["user-last-seen", userId],
+    queryFn: () => getUserLastSeen(userId),
     enabled: !!userId,
   });
 };
