@@ -16,6 +16,7 @@ import {
   UpdateUsernameDto,
   Friendship,
   FriendshipWithUsers,
+  UserStatus,
 } from '../shared';
 import { User } from 'better-auth';
 import { ControllerResponse } from 'src/common/types/responce.type';
@@ -48,6 +49,15 @@ export class UsersController {
     );
 
     return { data: strangers, message: 'Strangers fetched successfully' };
+  }
+
+  @Get('status')
+  async getFriendsStatus(
+    @Session() session: UserSession,
+  ): Promise<ControllerResponse<UserStatus[]>> {
+    const statuses = await this.usersService.findUserStatus(session.user.id);
+
+    return { data: statuses, message: 'Statuses fetched successfully' };
   }
 
   @Get(':userId')

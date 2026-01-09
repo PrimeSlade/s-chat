@@ -14,3 +14,8 @@ export type FriendshipWithSenders = Prisma.FriendshipGetPayload<{
     sender: true;
   };
 }>;
+
+export type UserStatus = {
+  userId: string;
+  status: 'online' | 'offline';
+};

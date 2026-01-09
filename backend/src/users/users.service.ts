@@ -10,6 +10,7 @@ import {
   FriendshipWithSenders,
   FriendshipWithUsers,
   User,
+  UserStatus,
 } from '../shared';
 import { UsersRepository } from './users.repository';
 import { FriendStatus } from 'generated/prisma/enums';
@@ -27,8 +28,33 @@ export class UsersService {
   }
 
   //Find by username
-  async findUserByUserName(username: string, myId: string): Promise<User> {
+  async findUserByUserName(username: string): Promise<User> {
     return this.usersRepository.findUserByUserName(username);
+  }
+
+  async findUserStatus(myId: string): Promise<UserStatus[]> {
+    const friends = await this.usersRepository.findFriends(myId);
+
+    const friendIds = friends.map((relation) =>
+      relation.senderId === myId ? relation.receiverId : relation.senderId,
+    );
+
+    const countKeys = friendIds.map((id) => `user:${id}:count`);
+
+    const counts = (await this.cacheManager.mget(countKeys)) as (
+      | number
+      | null
+    )[];
+
+    const statuses: UserStatus[] = friends.map((friend, index) => {
+      const count = counts[index] || 0;
+      return {
+        userId: friend.id,
+        status: count >= 1 ? 'online' : 'offline',
+      };
+    });
+
+    return statuses;
   }
 
   async findUserLastSeen(userId: string): Promise<string | null> {
