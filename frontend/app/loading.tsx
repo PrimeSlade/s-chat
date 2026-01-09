@@ -1,9 +1,7 @@
 import {
   ChatHeaderSkeleton,
   ChatItemSkeleton,
-  ChatMessageSkeleton,
 } from "@/components/chat-list/chat-skeletons";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (

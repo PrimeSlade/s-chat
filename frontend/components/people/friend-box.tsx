@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { StatusBadge } from "../ui/status-badge";
 import { User } from "@backend/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -20,14 +21,13 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export type Status = "online" | "away" | "idle";
-
 interface FriendBoxProps {
   user: User;
   variant: "friend" | "stranger";
+  status?: "online" | "offline";
 }
 
-export function FriendBox({ user, variant }: FriendBoxProps) {
+export function FriendBox({ user, variant, status }: FriendBoxProps) {
   const queryClient = useQueryClient();
 
   const acceptMutation = useMutation({
@@ -87,14 +87,7 @@ export function FriendBox({ user, variant }: FriendBoxProps) {
           height={48}
           className="rounded-full"
         />
-        {/* Status */}
-        {/* {user.status && (
-          <div
-            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-              statusClasses[user.status]
-            }`}
-          ></div>
-        )} */}
+        {status && <StatusBadge status={status} />}
       </div>
       <div className="flex-1">
         <h3 className="font-semibold">{user.name}</h3>

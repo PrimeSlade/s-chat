@@ -6,6 +6,7 @@ import {
   ResponseFormat,
   UpdateUsernameDto,
   User,
+  UserStatus,
 } from "@backend/shared";
 
 const getFriends = async (): Promise<
@@ -162,6 +163,20 @@ const getUserLastSeen = async (
   }
 };
 
+const getFriendsStatus = async (): Promise<
+  ResponseFormat<UserStatus[]> | undefined
+> => {
+  try {
+    const { data } = await axiosInstance.get<ResponseFormat<UserStatus[]>>(
+      "/users/status"
+    );
+    return data;
+  } catch (error: any) {
+    console.log(error.response.data);
+    throw new Error(error.response.data.message);
+  }
+};
+
 export {
   getFriends,
   getStrangers,
@@ -173,4 +188,5 @@ export {
   blockUser,
   getUserById,
   getUserLastSeen,
+  getFriendsStatus,
 };

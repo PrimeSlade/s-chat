@@ -1,11 +1,13 @@
 "use client";
 import { FriendBox } from "@/components/people/friend-box";
-import { useFriends } from "@/hooks/use-friends";
+import { useFriends, useFriendsStatus } from "@/hooks/use-friends";
 import { useSession } from "@/lib/auth-client";
 import { chooseFriends } from "@/lib/hanldeFriends";
 
 export default function FriendPage() {
   const { data: friendData } = useFriends();
+  const { data: userStatuses } = useFriendsStatus();
+
   const { data: session } = useSession();
 
   if (!session || !friendData?.data) return null;
@@ -25,9 +27,20 @@ export default function FriendPage() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-      {friends.map((friend) => (
-        <FriendBox key={friend.id} user={friend} variant="friend" />
-      ))}
+      {friends.map((friend) => {
+        const userStatus = userStatuses?.data?.find(
+          (status) => status.userId === friend.id
+        );
+
+        return (
+          <FriendBox
+            key={friend.id}
+            user={friend}
+            variant="friend"
+            status={userStatus?.status}
+          />
+        );
+      })}
     </div>
   );
 }

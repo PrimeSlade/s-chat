@@ -46,10 +46,10 @@ export class UsersService {
       | null
     )[];
 
-    const statuses: UserStatus[] = friends.map((friend, index) => {
+    const statuses: UserStatus[] = friendIds.map((id, index) => {
       const count = counts[index] || 0;
       return {
-        userId: friend.id,
+        userId: id,
         status: count >= 1 ? 'online' : 'offline',
       };
     });
