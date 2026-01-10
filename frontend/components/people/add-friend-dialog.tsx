@@ -74,6 +74,7 @@ export function AddFriendDialog() {
               placeholder="user@123"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              autoComplete="new-password"
             />
           </div>
 

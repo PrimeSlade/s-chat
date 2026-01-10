@@ -1,5 +1,4 @@
 interface StatusBadgeProps {
-  status: "online" | "offline";
   size?: "sm" | "md" | "lg";
 }
 
@@ -9,12 +8,10 @@ const sizeMap = {
   lg: "w-4 h-4",
 };
 
-export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
+export function StatusBadge({ size = "md" }: StatusBadgeProps) {
   return (
     <div
-      className={`absolute bottom-0 right-0 border-2 border-background rounded-full ${
-        sizeMap[size]
-      } ${status === "online" ? "bg-green-500" : "bg-gray-400"}`}
+      className={`absolute bottom-0 right-0 border-2 border-background rounded-full ${sizeMap[size]} bg-green-500`}
     />
   );
 }

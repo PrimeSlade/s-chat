@@ -3,7 +3,7 @@
 import { ChatItem } from "./chat-item";
 import { getInitials, getRoomDisplay } from "@/lib/utils";
 import { useRooms } from "@/hooks/use-rooms";
-import { useUserById } from "@/hooks/use-friends";
+import { useFriendsStatus, useUserById } from "@/hooks/use-friends";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -18,6 +18,8 @@ export function ChatList() {
   const { data: roomsData } = useRooms();
 
   const { data: userData } = useUserById(userId as string);
+
+  const { data: userStatuses } = useFriendsStatus();
 
   const handleItemClick = (url: string) => {
     router.push(url);
@@ -54,6 +56,11 @@ export function ChatList() {
           onClick={() => handleItemClick(`/chat/dm/${userData.data.id}`)}
           timestamp={new Date()}
           unreadCount={0}
+          status={
+            userStatuses?.data?.find(
+              (status) => status.userId === userData.data.id
+            )?.status
+          }
         />
       )}
 
@@ -67,6 +74,10 @@ export function ChatList() {
 
         const initials = getInitials(displayName);
 
+        const userStatus = userStatuses?.data?.find(
+          (status) => status.userId === room.participants[0].userId
+        );
+
         return (
           <ChatItem
             key={room.id}
@@ -79,6 +90,7 @@ export function ChatList() {
             avatarUrl={avatarUrl}
             isActive={activeRoomId === room.id}
             onClick={() => handleItemClick(`/chat/${room.id}`)}
+            status={userStatus?.status}
           />
         );
       })}

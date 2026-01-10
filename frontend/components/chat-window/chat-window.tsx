@@ -97,7 +97,7 @@ export function ChatWindow({
     return () => {
       socket.off("new_message", handleNewMessage);
     };
-  }, []);
+  }, [socket, roomId, queryClient]);
 
   const isLoading =
     isLoadingMessages || (isGhostMode && isLoadingGhostUser) || isFetchingRoom;

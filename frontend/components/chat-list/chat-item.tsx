@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { cn, formatTimestamp, truncate } from "@/lib/utils";
 import { useState } from "react";
 
@@ -15,6 +16,7 @@ type ChatItemProps = {
   avatarUrl?: string; // Optional avatar image
   isActive: boolean;
   onClick: (roomId: string) => void;
+  status?: "online" | "offline";
 };
 
 export function ChatItem({
@@ -27,6 +29,7 @@ export function ChatItem({
   avatarUrl,
   isActive,
   onClick,
+  status,
 }: ChatItemProps) {
   return (
     <div
@@ -36,10 +39,13 @@ export function ChatItem({
         isActive ? "bg-border" : "hover:bg-border/70"
       )}
     >
-      <Avatar className="h-10 w-10">
-        <AvatarImage src={avatarUrl} alt={name} />
-        <AvatarFallback>{initials}</AvatarFallback>
-      </Avatar>
+      <div className="relative">
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={avatarUrl} alt={name} />
+          <AvatarFallback>{initials}</AvatarFallback>
+        </Avatar>
+        {status === "online" && <StatusBadge />}
+      </div>
       <div className="flex-1 overflow-hidden">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold truncate">{name}</h3>

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Check, MessageSquare, MoreHorizontal, X } from "lucide-react";
 import {
   DropdownMenu,
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { StatusBadge } from "../ui/status-badge";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User } from "@backend/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/lib/api/friends";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getInitials } from "@/lib/utils";
 
 interface FriendBoxProps {
   user: User;
@@ -80,14 +81,11 @@ export function FriendBox({ user, variant, status }: FriendBoxProps) {
   return (
     <div className="p-4 rounded-lg cursor-pointer transition-colors flex items-center space-x-4 border">
       <div className="relative">
-        <Image
-          src={user.image || "https://github.com/shadcn.png"}
-          alt={user.name}
-          width={48}
-          height={48}
-          className="rounded-full"
-        />
-        {status && <StatusBadge status={status} />}
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={user.image!} />
+          <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+        </Avatar>
+        {status === "online" && <StatusBadge />}
       </div>
       <div className="flex-1">
         <h3 className="font-semibold">{user.name}</h3>

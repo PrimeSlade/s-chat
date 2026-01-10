@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from "react";
 import { socket } from "@/lib/socket";
 import { authClient } from "@/lib/auth-client";
 
-export const SocketProvider = ({ children }: { children: ReactNode }) => {
+export default function SocketProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const connectSocket = async () => {
       const { data } = await authClient.token();
@@ -25,4 +25,4 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return <>{children}</>;
-};
+}

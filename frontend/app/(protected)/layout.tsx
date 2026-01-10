@@ -1,6 +1,7 @@
 import AuthGuard from "@/components/guards/auth-guard";
 import React from "react";
-import { SocketProvider } from "../providers/socket-provider";
+import SocketProvider from "../providers/socket-provider";
+import UserStatusProvider from "../providers/user-status-provider";
 
 export default function ProtectedLayout({
   children,
@@ -10,7 +11,9 @@ export default function ProtectedLayout({
   return (
     <div>
       <AuthGuard>
-        <SocketProvider>{children}</SocketProvider>
+        <SocketProvider>
+          <UserStatusProvider>{children}</UserStatusProvider>
+        </SocketProvider>
       </AuthGuard>
     </div>
   );
