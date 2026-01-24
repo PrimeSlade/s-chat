@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./styles/messaging-theme.css";
+@import "./styles/theme-colors.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -122,5 +123,25 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: rotate(-5deg);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: rotate(5deg);
   }
 }

@@ -1,0 +1,15 @@
+/* theme-colors.css */
+/* General UI Colors */
+
+:root {
+  /* Destructive/Error Colors */
+  --destructive: #ef4444; /* red-500 */
+  --destructive-hover: #dc2626; /* red-600 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --destructive: #f87171; /* red-400 - lighter for dark mode */
+    --destructive-hover: #ef4444; /* red-500 */
+  }
+}
