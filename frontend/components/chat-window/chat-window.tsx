@@ -1,10 +1,10 @@
 "use client";
 import ChatHeader from "./chat-header";
-import { useUserById, useUserLastSeen } from "@/hooks/use-friends";
+import { useUserById } from "@/hooks/use-friends";
 import { useMyRoomByRoomId } from "@/hooks/use-rooms";
 import ChatInput from "./chat-input";
 import { MessageList } from "../message/message-list";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { socket } from "@/lib/socket";
 import { getInitials, getRoomDisplay } from "@/lib/utils";
 import { useMessages } from "@/hooks/use-messages";
@@ -28,6 +28,10 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const [isTypingUsers, setIsTypingUsers] = useState<Set<string>>(new Set());
+
+  const timeouts = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const { data: ghostUser, isLoading: isLoadingGhostUser } = useUserById(
     userId!
@@ -90,12 +94,38 @@ export function ChatWindow({
           ],
         };
       });
+
+      //Immediately remove this user from the typing list if new message arrives before it is expired
+      setIsTypingUsers((prev) => {
+        const next = new Set(prev);
+        next.delete(message.data.senderId);
+        return next;
+      });
+    };
+
+    const handleTyping = (userId: string) => {
+      setIsTypingUsers((prev) => new Set(prev).add(userId));
+
+      if (timeouts.current[userId]) {
+        clearTimeout(timeouts.current[userId]);
+      }
+
+      timeouts.current[userId] = setTimeout(() => {
+        setIsTypingUsers((prev) => {
+          const next = new Set(prev);
+          next.delete(userId);
+          return next;
+        });
+        delete timeouts.current[userId];
+      }, 3000);
     };
 
     socket.on("new_message", handleNewMessage);
+    socket.on("user_typing", handleTyping);
 
     return () => {
       socket.off("new_message", handleNewMessage);
+      socket.off("user_typing", handleTyping);
     };
   }, [socket, roomId, queryClient]);
 
@@ -134,6 +164,8 @@ export function ChatWindow({
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
+          isTypingUsers={isTypingUsers}
+          participants={roomData?.data.room?.participants}
         />
       ) : (
         <div className="flex-1 overflow-y-auto p-4 space-y-4">

@@ -5,12 +5,21 @@ import { useInView } from "react-intersection-observer";
 import { MessageWithSender } from "@backend/shared";
 import { Spinner } from "../ui/spinner";
 import { formatDateLabelForChatWindow } from "@/lib/utils";
+import { TypingIndicator } from "../chat-window/typing-indicator";
 
 interface MessageListProps {
   messages: MessageWithSender[];
   fetchNextPage: () => void;
   hasNextPage: boolean | undefined;
   isFetchingNextPage: boolean;
+  isTypingUsers?: Set<string>;
+  participants?: {
+    user: {
+      id: string;
+      name?: string | null;
+      image?: string | null;
+    };
+  }[];
 }
 
 export function MessageList({
@@ -18,6 +27,8 @@ export function MessageList({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  isTypingUsers,
+  participants,
 }: MessageListProps) {
   const { data: session } = useSession();
 
@@ -65,7 +76,7 @@ export function MessageList({
     if (isAtBottom) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, isTypingUsers]);
 
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto px-4 space-y-4">
@@ -109,6 +120,14 @@ export function MessageList({
           </>
         );
       })}
+
+      {/* Typing Indicator */}
+      {isTypingUsers && (
+        <TypingIndicator
+          typingUsers={isTypingUsers}
+          participants={participants}
+        />
+      )}
 
       {/* BOTTOM ANCHOR */}
       <div ref={bottomRef} />
