@@ -6,6 +6,7 @@ import {
   Room,
   CreateDirectRoomDto,
   RoomParticipantWithRoomByRoomId,
+  CreateGroupRoomDto,
 } from 'src/shared';
 import { MessagesRepository } from 'src/messages/messages.repository';
 import { PrismaService } from 'src/prisma.service';
@@ -36,7 +37,7 @@ export class RoomsService {
         roomId: existingRoom.roomId,
       });
 
-      this.eventEmitter.emit('message.created', existingRoom.roomId, message);
+      this.eventEmitter.emit('message_created', existingRoom.roomId, message);
 
       return existingRoom;
     }
@@ -64,9 +65,10 @@ export class RoomsService {
       );
 
       //web socket
-      console.log(`📤 Emitting new_message to room: ${room.id}`, message);
+      // console.log(`📤 Emitting new_message to room: ${room.id}`, message);
 
-      this.eventEmitter.emit('message.created', room.id, message);
+      this.eventEmitter.emit('message_created', room.id, message);
+      this.eventEmitter.emit('room_created', data.otherId);
 
       return room;
     });
@@ -88,5 +90,9 @@ export class RoomsService {
     userId: string,
   ): Promise<RoomParticipantWithRoomByUserId | null> {
     return this.roomsRepository.findRoomByUserId(myId, userId);
+  }
+
+  async createGroupRoom(data: CreateGroupRoomDto, myId: string): Promise<Room> {
+    return this.roomsRepository.createGroupRoom(data, myId);
   }
 }

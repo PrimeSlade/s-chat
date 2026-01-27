@@ -17,6 +17,8 @@ import {
   RoomParticipantWithRoomByUserId,
   CreateDirectRoomDto,
   createDirectRoomSchema,
+  CreateGroupRoomDto,
+  createGroupRoomSchema,
 } from 'src/shared';
 import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 import { ControllerResponse } from 'src/common/types/responce.type';
@@ -37,6 +39,16 @@ export class RoomsController {
     );
 
     return { data: room, message: 'Room created successfully' };
+  }
+
+  @Post('group-room')
+  async createGroupRoom(
+    @Body(new ZodValidationPipe(createGroupRoomSchema))
+    body: CreateGroupRoomDto,
+    @Session() session: UserSession,
+  ) {
+    const room = await this.roomsService.createGroupRoom(body, session.user.id);
+    return { data: room, message: 'Group room created successfully' };
   }
 
   @Get('me')

@@ -6,3 +6,11 @@ export const createDirectRoomSchema = z.object({
 });
 
 export type CreateDirectRoomDto = z.infer<typeof createDirectRoomSchema>;
+
+export const createGroupRoomSchema = z.object({
+  groupName: z.string().min(1).max(100),
+  friendIds: z.array(z.string()).min(1),
+  image: z.string().optional(),
+});
+
+export type CreateGroupRoomDto = z.infer<typeof createGroupRoomSchema>;

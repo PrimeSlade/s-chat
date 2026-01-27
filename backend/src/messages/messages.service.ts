@@ -24,7 +24,7 @@ export class MessagesService {
   }): Promise<MessageWithSender> {
     const message = await this.messagesRepository.createMessage(data);
 
-    this.eventEmitter.emit('message.created', message.roomId, message);
+    this.eventEmitter.emit('message_created', message.roomId, message);
 
     return message;
   }

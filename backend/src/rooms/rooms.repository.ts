@@ -8,6 +8,7 @@ import {
   RoomParticipantWithRoomByUserId,
   Room,
   RoomParticipantWithRoomByRoomId,
+  CreateGroupRoomDto,
 } from 'src/shared';
 
 @Injectable()
@@ -126,6 +127,22 @@ export class RoomsReposiory {
         type: RoomType.DIRECT,
         participants: {
           create: [{ userId: data.myId }, { userId: data.otherId }],
+        },
+      },
+    });
+  }
+
+  async createGroupRoom(data: CreateGroupRoomDto, myId: string): Promise<Room> {
+    const allParticipantIds = [myId, ...data.friendIds];
+
+    return this.prismaService.room.create({
+      data: {
+        type: RoomType.GROUP,
+        name: data.groupName,
+        participants: {
+          create: allParticipantIds.map((id) => ({
+            userId: id,
+          })),
         },
       },
     });
