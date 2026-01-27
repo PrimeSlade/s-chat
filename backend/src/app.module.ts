@@ -25,7 +25,15 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       useFactory: async (configService: ConfigService) => {
         const redisUrl = `redis://default:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`;
 
-        const redisStore = new KeyvRedis(redisUrl);
+        const redisStore = new KeyvRedis({
+          url: redisUrl,
+          socket: {
+            reconnectStrategy: (retries) => {
+              console.log(`Redis reconnect #${retries}`);
+              return Math.min(retries * 500, 3000);
+            },
+          },
+        });
 
         redisStore.on('error', (err) => {
           console.error('Redis connection error:', err);
