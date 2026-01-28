@@ -147,4 +147,10 @@ export class RoomsReposiory {
       },
     });
   }
+
+  async countRoomParticipants(roomId: string): Promise<number> {
+    return this.prismaService.roomParticipant.count({
+      where: { roomId },
+    });
+  }
 }

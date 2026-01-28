@@ -73,3 +73,8 @@ export type RoomParticipantWithRoomByRoomId = Prisma.RoomParticipantGetPayload<{
     };
   };
 }>;
+
+export interface RoomParticipantCount {
+  roomId: string;
+  totalMembers: number;
+}

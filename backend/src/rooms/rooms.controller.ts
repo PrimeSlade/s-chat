@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Session,
+  UseGuards,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 
@@ -19,9 +20,11 @@ import {
   createDirectRoomSchema,
   CreateGroupRoomDto,
   createGroupRoomSchema,
+  RoomParticipantCount,
 } from 'src/shared';
 import { ZodValidationPipe } from 'src/common/pipes/zod.validation.pipe';
 import { ControllerResponse } from 'src/common/types/responce.type';
+import { HttpRoomGuard } from 'src/common/guards/http-room.guard';
 
 @Controller('rooms')
 export class RoomsController {
@@ -84,5 +87,15 @@ export class RoomsController {
     );
 
     return { data: room, message: 'Room fetched successfully' };
+  }
+
+  @UseGuards(HttpRoomGuard)
+  @Get(':roomId/participants/count')
+  async getRoomParticipantCount(
+    @Param('roomId') roomId: string,
+  ): Promise<ControllerResponse<RoomParticipantCount>> {
+    const count = await this.roomsService.getRoomParticipantCount(roomId);
+
+    return { data: count, message: 'Participant count fetched successfully' };
   }
 }

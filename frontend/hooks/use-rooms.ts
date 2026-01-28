@@ -1,4 +1,9 @@
-import { getRoomByUserId, getRooms, getMyRoomByRoomId } from "@/lib/api/rooms";
+import {
+  getRoomByUserId,
+  getRooms,
+  getMyRoomByRoomId,
+  getRoomParticipantCount,
+} from "@/lib/api/rooms";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export const useRooms = () => {
@@ -20,6 +25,14 @@ export const useMyRoomByRoomId = (roomId: string) => {
   return useQuery({
     queryKey: ["room", "me", roomId],
     queryFn: () => getMyRoomByRoomId(roomId),
+    enabled: !!roomId,
+  });
+};
+
+export const useRoomParticipantCount = (roomId: string) => {
+  return useQuery({
+    queryKey: ["room", roomId, "participants", "count"],
+    queryFn: () => getRoomParticipantCount(roomId),
     enabled: !!roomId,
   });
 };

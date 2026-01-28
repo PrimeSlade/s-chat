@@ -14,12 +14,15 @@ export function ChatItemSkeleton() {
 
 export function ChatHeaderSkeleton() {
   return (
-    <div className="flex items-center gap-4 p-4">
-      <Skeleton className="size-10 rounded-full" />
-      <div className="space-y-1">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-3 w-16" />
+    <div className="flex items-center justify-between p-4">
+      <div className="flex items-center gap-4">
+        <Skeleton className="size-10 rounded-full" />
+        <div className="space-y-1">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-16" />
+        </div>
       </div>
+      <Skeleton className="h-6 w-6" />
     </div>
   );
 }

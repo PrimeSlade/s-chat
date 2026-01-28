@@ -1,7 +1,7 @@
 "use client";
 import ChatHeader from "./chat-header";
 import { useUserById } from "@/hooks/use-friends";
-import { useMyRoomByRoomId } from "@/hooks/use-rooms";
+import { useMyRoomByRoomId, useRoomParticipantCount } from "@/hooks/use-rooms";
 import ChatInput from "./chat-input";
 import { MessageList } from "../message/message-list";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { MessageSkeletonLoader } from "./message-skeleton-loader";
 import { ChatHeaderSkeleton } from "../chat-list/chat-skeletons";
+import ChatHeaderGroup from "./chat-header-group";
 
 interface ChatWindowProps {
   roomId?: string;
@@ -54,6 +55,8 @@ export function ChatWindow({
     roomId: roomId!,
     limit: 20,
   });
+
+  const { data: countData } = useRoomParticipantCount(roomId!);
 
   const error = fetchMessageError || fetchRoomError;
 
@@ -147,11 +150,19 @@ export function ChatWindow({
       <div className="border-b">
         {isLoading ? (
           <ChatHeaderSkeleton />
-        ) : (
+        ) : roomData!.data.room.type === "DIRECT" ? (
           <ChatHeader
             userId={displayUserId}
             name={displayName}
             image={avatarUrl}
+          />
+        ) : (
+          <ChatHeaderGroup
+            roomId={roomData!.data.roomId}
+            name={roomData!.data.room.name!}
+            image={roomData!.data.room.image!}
+            totalMembers={countData?.data.totalMembers ?? 0}
+            onlineMembers={0} // Calculate from participant status
           />
         )}
       </div>

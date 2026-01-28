@@ -17,8 +17,6 @@ export function ChatList() {
 
   const { data: roomsData } = useRooms();
 
-  console.log(roomsData);
-
   const { data: userData } = useUserById(userId as string);
 
   const { data: userStatuses } = useFriendsStatus();
@@ -70,6 +68,8 @@ export function ChatList() {
       {roomsData?.data.map((participant) => {
         const { room } = participant;
 
+        console.log(room);
+
         const lastMessage = room.messages?.[0];
 
         const { displayName, avatarUrl } = getRoomDisplay(room);
@@ -94,7 +94,7 @@ export function ChatList() {
             avatarUrl={avatarUrl}
             isActive={activeRoomId === room.id}
             onClick={() => handleItemClick(`/chat/${room.id}`)}
-            status={userStatus?.status}
+            status={room.type === "GROUP" ? "offline" : userStatus?.status}
           />
         );
       })}
