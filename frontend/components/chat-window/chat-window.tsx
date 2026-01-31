@@ -131,7 +131,22 @@ export function ChatWindow({
   }, [socket, roomId, queryClient]);
 
   const isLoading =
-    isLoadingMessages || (isGhostMode && isLoadingGhostUser) || isFetchingRoom;
+    isLoadingMessages ||
+    (isGhostMode && isLoadingGhostUser) ||
+    isFetchingRoom ||
+    (!isGhostMode && !roomData);
+
+  // Show unified loading state
+  if (isLoading) {
+    return (
+      <div className="flex h-screen flex-col">
+        <div className="border-b">
+          <ChatHeaderSkeleton />
+        </div>
+        <MessageSkeletonLoader />
+      </div>
+    );
+  }
 
   const { displayUserId, displayName, avatarUrl } =
     isGhostMode && ghostUser
@@ -146,8 +161,12 @@ export function ChatWindow({
     <div className="flex h-screen flex-col">
       {/* Header */}
       <div className="border-b">
-        {isLoading ? (
-          <ChatHeaderSkeleton />
+        {isGhostMode ? (
+          <ChatHeader
+            userId={displayUserId}
+            name={displayName}
+            image={avatarUrl}
+          />
         ) : roomData!.data.room.type === "DIRECT" ? (
           <ChatHeader
             userId={displayUserId}
@@ -160,14 +179,12 @@ export function ChatWindow({
             name={roomData!.data.room.name!}
             image={roomData!.data.room.image!}
             totalMembers={roomData!.data.room._count.participants ?? 0}
-            onlineMembers={0} // Calculate from participant status
+            onlineMembers={roomData!.data.activeMembers}
           />
         )}
       </div>
 
-      {isLoading && messages.length === 0 ? (
-        <MessageSkeletonLoader />
-      ) : messages.length > 0 ? (
+      {messages.length > 0 ? (
         <MessageList
           messages={messages}
           fetchNextPage={fetchNextPage}

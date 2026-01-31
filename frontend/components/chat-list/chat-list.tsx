@@ -2,24 +2,34 @@
 
 import { ChatItem } from "./chat-item";
 import { getInitials, getRoomDisplay } from "@/lib/utils";
-import { useRooms } from "@/hooks/use-rooms";
-import { useFriendsStatus, useUserById } from "@/hooks/use-friends";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import {
+  ResponseFormat,
+  RoomParticipantWithRoom,
+  User,
+  UserStatus,
+} from "@backend/shared";
 
-export function ChatList() {
-  const { userId, roomId } = useParams();
+interface ChatListProps {
+  roomsData: ResponseFormat<RoomParticipantWithRoom[]> | undefined;
+  userData: ResponseFormat<User> | undefined;
+  userStatuses: ResponseFormat<UserStatus[]> | undefined;
+  userId: string;
+  roomId?: string;
+}
 
+export function ChatList({
+  roomsData,
+  userData,
+  userStatuses,
+  userId,
+  roomId,
+}: ChatListProps) {
   const router = useRouter();
 
   const activeRoomId = roomId;
-
-  const { data: roomsData } = useRooms();
-
-  const { data: userData } = useUserById(userId as string);
-
-  const { data: userStatuses } = useFriendsStatus();
 
   const handleItemClick = (url: string) => {
     router.push(url);
