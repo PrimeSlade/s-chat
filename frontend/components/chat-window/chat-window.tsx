@@ -136,6 +136,12 @@ export function ChatWindow({
     isFetchingRoom ||
     (!isGhostMode && !roomData);
 
+  const onlineMembers = roomData?.data.room.participants.reduce(
+    (acc, participant) =>
+      participant.user.status === "online" ? acc + 1 : acc,
+    0
+  );
+
   // Show unified loading state
   if (isLoading) {
     return (
@@ -179,7 +185,7 @@ export function ChatWindow({
             name={roomData!.data.room.name!}
             image={roomData!.data.room.image!}
             totalMembers={roomData!.data.room._count.participants ?? 0}
-            onlineMembers={roomData!.data.activeMembers}
+            onlineMembers={onlineMembers ?? 0}
           />
         )}
       </div>

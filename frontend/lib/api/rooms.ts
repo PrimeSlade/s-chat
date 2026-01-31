@@ -5,7 +5,7 @@ import {
   RoomParticipantWithRoomByUserId,
   RoomParticipantWithRoomByRoomId,
   Room,
-  RoomWithActiveMembers,
+  RoomWithParticipantStatus,
 } from "@backend/shared";
 
 const getRooms = async (): Promise<
@@ -38,10 +38,10 @@ const getRoomByUserId = async (
 
 const getMyRoomByRoomId = async (
   roomId: string
-): Promise<ResponseFormat<RoomWithActiveMembers> | undefined> => {
+): Promise<ResponseFormat<RoomWithParticipantStatus> | undefined> => {
   try {
     const { data } = await axiosInstance.get<
-      ResponseFormat<RoomWithActiveMembers>
+      ResponseFormat<RoomWithParticipantStatus>
     >(`/rooms/me/${roomId}`);
     return data;
   } catch (error: any) {

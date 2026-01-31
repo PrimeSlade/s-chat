@@ -4,7 +4,11 @@ import { socket } from "@/lib/socket";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ResponseFormat, RoomWithActiveMembers } from "@backend/shared";
+import {
+  ResponseFormat,
+  RoomWithParticipantStatus,
+  UserStatus,
+} from "@backend/shared";
 
 export default function ChatPage() {
   const { roomId } = useParams();
@@ -14,32 +18,70 @@ export default function ChatPage() {
     console.log("📍 Joining room:", roomId);
     socket.emit("join_room", { roomId });
 
-    const handleUserJoin = () => {
-      queryClient.setQueryData<ResponseFormat<RoomWithActiveMembers>>(
+    const handleUserJoin = (payload: UserStatus) => {
+      console.log(payload);
+
+      queryClient.setQueryData<ResponseFormat<RoomWithParticipantStatus>>(
         ["room", "me", roomId],
         (oldData) => {
           if (!oldData) return oldData;
+
           return {
             ...oldData,
             data: {
               ...oldData.data,
-              activeMembers: oldData.data.activeMembers + 1,
+              room: {
+                ...oldData.data.room,
+                participants: oldData.data.room.participants.map(
+                  (participant) => {
+                    if (participant.userId === payload.userId) {
+                      return {
+                        ...participant,
+                        user: {
+                          ...participant.user,
+                          status: payload.status, // Update status
+                        },
+                      };
+                    }
+
+                    return participant;
+                  }
+                ),
+              },
             },
           };
         }
       );
     };
 
-    const handleUserLeave = () => {
-      queryClient.setQueryData<ResponseFormat<RoomWithActiveMembers>>(
+    const handleUserLeave = (payload: UserStatus) => {
+      queryClient.setQueryData<ResponseFormat<RoomWithParticipantStatus>>(
         ["room", "me", roomId],
         (oldData) => {
           if (!oldData) return oldData;
+
           return {
             ...oldData,
             data: {
               ...oldData.data,
-              activeMembers: Math.max(0, oldData.data.activeMembers - 1),
+              room: {
+                ...oldData.data.room,
+                participants: oldData.data.room.participants.map(
+                  (participant) => {
+                    if (participant.userId === payload.userId) {
+                      return {
+                        ...participant,
+                        user: {
+                          ...participant.user,
+                          status: payload.status, // Update status
+                        },
+                      };
+                    }
+
+                    return participant;
+                  }
+                ),
+              },
             },
           };
         }

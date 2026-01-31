@@ -78,8 +78,6 @@ export function ChatList({
       {roomsData?.data.map((participant) => {
         const { room } = participant;
 
-        console.log(room);
-
         const lastMessage = room.messages?.[0];
 
         const { displayName, avatarUrl } = getRoomDisplay(room);
